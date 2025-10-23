@@ -1,0 +1,215 @@
+﻿@model Ecomm.Controllers.CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">Checkout</h2>
+
+    <form asp-action="ProcessOrder" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <!-- Customer Information -->
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Customer Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="FullName" class="form-label">Full Name *</label>
+                                    <input asp-for="FullName" class="form-control" required />
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label">Email *</label>
+                                    <input asp-for="Email" class="form-control" type="email" required />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label">Phone Number *</label>
+                            <input asp-for="Phone" class="form-control" required />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">Shipping Address *</label>
+                            <textarea asp-for="Address" class="form-control" rows="3" required></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="City" class="form-label">City *</label>
+                                    <input asp-for="City" class="form-control" required />
+                                    <span asp-validation-for="City" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ZipCode" class="form-label">ZIP Code *</label>
+                                    <input asp-for="ZipCode" class="form-control" required />
+                                    <span asp-validation-for="ZipCode" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Payment Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="NameOnCard" class="form-label">Name on Card *</label>
+                            <input asp-for="NameOnCard" class="form-control" required />
+                            <span asp-validation-for="NameOnCard" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CardNumber" class="form-label">Card Number *</label>
+                            <input asp-for="CardNumber" class="form-control" placeholder="1234 5678 9012 3456" required />
+                            <span asp-validation-for="CardNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ExpiryDate" class="form-label">Expiry Date *</label>
+                                    <input asp-for="ExpiryDate" class="form-control" placeholder="MM/YY" required />
+                                    <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CVV" class="form-label">CVV *</label>
+                                    <input asp-for="CVV" class="form-control" placeholder="123" required />
+                                    <span asp-validation-for="CVV" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="saveCard" name="saveCard">
+                            <label class="form-check-label" for="saveCard">
+                                Save card for future purchases
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <h6 class="mb-0">@item.Product.Name</h6>
+                                    <small class="text-muted">Qty: @item.Quantity</small>
+                                </div>
+                                <span>@((item.Product.Price * item.Quantity).ToString("C2"))</span>
+                            </div>
+                        }
+
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>@Model.TotalAmount.ToString("C2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Shipping:</span>
+                            <span>Free</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tax:</span>
+                            <span>@((Model.TotalAmount * 0.1m).ToString("C2"))</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Total:</strong>
+                            <strong>@((Model.TotalAmount * 1.1m).ToString("C2"))</strong>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Place Order
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-lock"></i> Your payment information is secure and encrypted
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support Information -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6>Need Help?</h6>
+                        <p class="small mb-1">
+                            <i class="fas fa-phone"></i> 1-800-ECOMMERCE
+                        </p>
+                        <p class="small mb-1">
+                            <i class="fas fa-envelope"></i> support@ecommerce.com
+                        </p>
+                        <p class="small mb-0">
+                            <i class="fas fa-clock"></i> 24/7 Support
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Format card number
+        $('#CardNumber').on('input', function() {
+            var value = $(this).val().replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            var matches = value.match(/\d{4,16}/g);
+            var match = matches && matches[0] || '';
+            var parts = [];
+
+            for (var i = 0, len = match.length; i < len; i += 4) {
+                parts.push(match.substring(i, i + 4));
+            }
+
+            if (parts.length) {
+                $(this).val(parts.join(' '));
+            }
+        });
+
+        // Format expiry date
+        $('#ExpiryDate').on('input', function() {
+            var value = $(this).val().replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            $(this).val(value);
+        });
+    </script>
+}

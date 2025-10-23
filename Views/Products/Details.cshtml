@@ -1,0 +1,111 @@
+﻿@model Ecomm.Models.Product
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Products")">Products</a></li>
+            <li class="breadcrumb-item active">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Image -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="max-height: 500px; object-fit: contain;">
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="h2">@Model.Name</h1>
+                    <p class="text-muted">Category: @Model.Category?.Name</p>
+
+                    <div class="mb-3">
+                        <span class="h3 text-primary">@Model.Price.ToString("C2")</span>
+                        @if (Model.IsOnSale)
+                        {
+                            <span class="badge bg-danger ms-2">On Sale</span>
+                        }
+                    </div>
+
+                    <!-- Stock Status -->
+                    <div class="mb-4">
+                        @if (Model.StockCount > 0)
+                        {
+                            <span class="badge bg-success fs-6">
+                                @Model.StockCount in stock
+                            </span>
+                            @if (Model.StockCount <= Model.LowStockThreshold)
+                            {
+                                <span class="badge bg-warning ms-2 fs-6">Low Stock</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger fs-6">Out of Stock</span>
+                        }
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p class="text-muted">@Model.Description</p>
+                    </div>
+
+                    <!-- Add to Cart Form -->
+                    @if (Model.StockCount > 0)
+                    {
+                        <form method="post" action="@Url.Action("AddToCart", "Cart")" class="mb-4">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="productId" value="@Model.Id">
+
+                            <div class="row g-3 align-items-center">
+                                <div class="col-auto">
+                                    <label for="quantity" class="col-form-label">Quantity:</label>
+                                </div>
+                                <div class="col-auto">
+                                    <input type="number" class="form-control" id="quantity" name="quantity"
+                                           value="1" min="1" max="@Model.StockCount" style="width: 100px;">
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary btn-lg" disabled>
+                            <i class="fas fa-times-circle"></i> Out of Stock
+                        </button>
+                    }
+
+                    <!-- Admin Actions -->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="mt-4 pt-3 border-top">
+                            <h6>Admin Actions</h6>
+                            <div class="btn-group">
+                                <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i> Edit Product
+                                </a>
+                                <a href="@Url.Action("Delete", new { id = Model.Id })" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

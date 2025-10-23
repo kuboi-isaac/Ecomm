@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Ecomm</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Ecomm.styles.css" asp-append-version="true" />
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        .navbar-search {
+            max-width: 400px;
+        }
+
+        .categories-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .cart-count {
+            font-size: 0.7em;
+            position: relative;
+            top: -10px;
+            left: -5px;
+        }
+
+        .dropdown-menu {
+            margin-top: 0;
+        }
+
+        .navbar-nav .nav-link {
+            padding: 0.5rem 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-shopping-bag me-2"></i>Ecomm
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <!-- Main Navigation -->
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home me-1"></i>Home
+                            </a>
+                        </li>
+
+                        <!-- Products Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-box me-1"></i>Products
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">All Products</a></li>
+                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Create">Add New Product</a></li>
+                                <li><a class="dropdown-item" asp-controller="Products" asp-action="LowStock">Low Stock Alerts</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Categories Hover Menu -->
+                        <li class="nav-item dropdown categories-dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-list me-1"></i>Categories
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="categoriesDropdown" id="categoriesMenu">
+                                <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">All Categories</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <!-- Categories will be loaded via AJAX -->
+                                <li><div class="dropdown-item text-muted">Loading categories...</div></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Checkout" asp-action="OrderHistory">
+                                <i class="fas fa-history me-1"></i>Order History
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Search Bar -->
+                    <form class="d-flex navbar-search me-3" method="get" action="@Url.Action("Index", "Products")">
+                        <div class="input-group">
+                            <input class="form-control" type="search" name="searchString" placeholder="Search products..." aria-label="Search">
+                            <button class="btn btn-outline-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Cart & User Section -->
+                    <ul class="navbar-nav">
+                        <!-- Shopping Cart -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark position-relative" asp-controller="Cart" asp-action="Index">
+                                <i class="fas fa-shopping-cart fa-lg"></i>
+                                <span class="badge bg-primary rounded-pill cart-count" id="cartCount">0</span>
+                            </a>
+                        </li>
+
+                        <!-- User Menu -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>Account
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <partial name="_LoginPartial" />
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Notification Messages -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6 class="fw-bold">Ecomm Store</h6>
+                    <p>Your one-stop shop for all your needs. Quality products, great prices, and excellent service.</p>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="fw-bold">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a asp-controller="Home" asp-action="Index" class="text-muted text-decoration-none">Home</a></li>
+                        <li><a asp-controller="Products" asp-action="Index" class="text-muted text-decoration-none">Products</a></li>
+                        <li><a asp-controller="Home" asp-action="Privacy" class="text-muted text-decoration-none">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="fw-bold">Contact Info</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-phone me-2"></i> 1-800-ECOMMERCE</li>
+                        <li><i class="fas fa-envelope me-2"></i> support@ecomm.com</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Store St, City</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                &copy; 2025 - Ecomm - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-muted">Privacy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Load categories for hover menu
+            function loadCategories() {
+                $.get('@Url.Action("GetCategoriesMenu", "Categories")', function(categories) {
+                    var menu = $('#categoriesMenu');
+                    menu.empty();
+
+                    // Add "All Categories" link
+                    menu.append(
+                        '<li><a class="dropdown-item" href="@Url.Action("Index", "Categories")">All Categories</a></li>' +
+                        '<li><hr class="dropdown-divider"></li>'
+                    );
+
+                    if (categories && categories.length > 0) {
+                        categories.forEach(function(category) {
+                            menu.append(
+                                `<li>
+                                    <a class="dropdown-item" href="@Url.Action("Products", "Categories")/${category.id}">
+                                        <i class="fas fa-folder me-2"></i>${category.name}
+                                        <span class="badge bg-secondary float-end">${category.productCount}</span>
+                                    </a>
+                                </li>`
+                            );
+                        });
+                    } else {
+                        menu.append('<li><a class="dropdown-item text-muted">No categories found</a></li>');
+                    }
+                }).fail(function() {
+                    $('#categoriesMenu').html('<li><a class="dropdown-item text-danger">Error loading categories</a></li>');
+                });
+            }
+
+            // Load cart count
+            function loadCartCount() {
+                $.get('@Url.Action("GetCartCount", "Cart")', function(data) {
+                    $('#cartCount').text(data.count);
+                }).fail(function() {
+                    $('#cartCount').text('0');
+                });
+            }
+
+            // Initialize
+            loadCategories();
+            loadCartCount();
+
+            // Refresh cart count every 30 seconds
+            setInterval(loadCartCount, 30000);
+
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 5000);
+
+            // Enhanced hover for categories (optional)
+            $('.categories-dropdown').hover(function() {
+                $(this).addClass('show');
+                $(this).find('.dropdown-menu').addClass('show');
+            }, function() {
+                $(this).removeClass('show');
+                $(this).find('.dropdown-menu').removeClass('show');
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
