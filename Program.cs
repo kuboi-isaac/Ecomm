@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Ecomm.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,8 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=ecomm.db"));
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+// Remove or comment out these lines if they cause errors:
+// builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+// Identity configuration - MUST be before builder.Build()
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
@@ -23,12 +26,16 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 
 builder.Services.AddControllersWithViews();
 
-var app = builder.Build();
+var app = builder.Build(); // Everything after this line is middleware configuration
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+    // Remove or comment out if it causes errors:
+    // app.UseMigrationsEndPoint();
+
+    // Use developer exception page instead
+    app.UseDeveloperExceptionPage();
 }
 else
 {
@@ -60,17 +67,36 @@ using (var scope = app.Services.CreateScope())
 
         if (created)
         {
-            Console.WriteLine("Database and tables created successfully!");
+            Console.WriteLine("✅ Database and tables created successfully!");
         }
         else
         {
-            Console.WriteLine("Database already exists.");
+            Console.WriteLine("ℹ️ Database already exists.");
         }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while creating the database.");
+        logger.LogError(ex, "❌ An error occurred while creating the database.");
+    }
+}
+
+// After database creation, add this:
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.EnsureCreated();
+
+        // Test database connection
+        var productCount = context.Products.Count();
+        Console.WriteLine($"✅ Database connected! Found {productCount} products.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Database connection failed: {ex.Message}");
     }
 }
 

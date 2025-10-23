@@ -16,7 +16,7 @@
         <!-- Product Image -->
         <div class="col-lg-6 mb-4">
             <div class="card">
-                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="max-height: 500px; object-fit: contain;">
+                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="max-height: 500px; object-fit: contain;" onerror="this.src='/images/products/default.png'">
             </div>
         </div>
 
@@ -25,7 +25,7 @@
             <div class="card">
                 <div class="card-body">
                     <h1 class="h2">@Model.Name</h1>
-                    <p class="text-muted">Category: @Model.Category?.Name</p>
+                    <p class="text-muted">Category: @(Model.Category?.Name ?? "Uncategorized")</p>
 
                     <div class="mb-3">
                         <span class="h3 text-primary">@Model.Price.ToString("C2")</span>
@@ -90,15 +90,15 @@
                     }
 
                     <!-- Admin Actions -->
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User.Identity?.IsAuthenticated == true)
                     {
                         <div class="mt-4 pt-3 border-top">
                             <h6>Admin Actions</h6>
                             <div class="btn-group">
-                                <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-outline-primary">
+                                <a href="@Url.Action("Edit", "Products", new { id = Model.Id })" class="btn btn-outline-primary">
                                     <i class="fas fa-edit"></i> Edit Product
                                 </a>
-                                <a href="@Url.Action("Delete", new { id = Model.Id })" class="btn btn-outline-danger">
+                                <a href="@Url.Action("Delete", "Products", new { id = Model.Id })" class="btn btn-outline-danger">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>
                             </div>
