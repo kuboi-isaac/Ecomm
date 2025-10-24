@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Ecomm.Data;
 using Ecomm.Models;
-using Ecomm.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecomm.Controllers
 {
@@ -61,21 +63,25 @@ namespace Ecomm.Controllers
         }
 
         // GET: Products/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            ViewData["Categories"] = _context.Categories.ToList();
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
         // POST: Products/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(Product product, IFormFile imageFile)
         {
             if (ModelState.IsValid)
             {
+                // Handle image upload OR use provided ImageUrl
                 if (imageFile != null && imageFile.Length > 0)
                 {
+                    // Upload local file
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
                     var filePath = Path.Combine(_environment.WebRootPath, "images", "products", fileName);
 
@@ -87,20 +93,23 @@ namespace Ecomm.Controllers
 
                     product.ImageUrl = $"/images/products/{fileName}";
                 }
-                else
+                else if (string.IsNullOrEmpty(product.ImageUrl))
                 {
-                    product.ImageUrl = "/images/products/default.png";
+                    // If no image file and no URL provided, use default
+                    product.ImageUrl = "https://via.placeholder.com/600x500/007bff/ffffff?text=No+Image";
                 }
+                // If ImageUrl is provided, it will be used directly
 
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Categories"] = await _context.Categories.ToListAsync();
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
             return View(product);
         }
 
         // GET: Products/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -113,13 +122,15 @@ namespace Ecomm.Controllers
             {
                 return NotFound();
             }
-            ViewData["Categories"] = await _context.Categories.ToListAsync();
+
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", product.CategoryId);
             return View(product);
         }
 
-        // POST: Products/Edit/5
+        // POST: Products/Edit/5 - FIXED VERSION
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, Product product, IFormFile imageFile)
         {
             if (id != product.Id)
@@ -131,8 +142,10 @@ namespace Ecomm.Controllers
             {
                 try
                 {
+                    // Handle image first
                     if (imageFile != null && imageFile.Length > 0)
                     {
+                        // Upload file and set local path
                         var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
                         var filePath = Path.Combine(_environment.WebRootPath, "images", "products", fileName);
 
@@ -144,9 +157,13 @@ namespace Ecomm.Controllers
 
                         product.ImageUrl = $"/images/products/{fileName}";
                     }
+                    // If no file is uploaded, the ImageUrl from the form is already set
+                    // So we don't need to do anything else - it will use the online URL
 
                     _context.Update(product);
                     await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -159,13 +176,14 @@ namespace Ecomm.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["Categories"] = await _context.Categories.ToListAsync();
+
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", product.CategoryId);
             return View(product);
         }
 
         // GET: Products/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -188,6 +206,7 @@ namespace Ecomm.Controllers
         // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var product = await _context.Products.FindAsync(id);
@@ -201,6 +220,7 @@ namespace Ecomm.Controllers
         }
 
         // Low Stock Alerts
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> LowStock()
         {
             var lowStockProducts = await _context.Products

@@ -22,6 +22,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequiredLength = 3;
 })
+.AddRoles<IdentityRole>() 
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
@@ -99,5 +100,6 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"❌ Database connection failed: {ex.Message}");
     }
 }
+
 
 app.Run();
