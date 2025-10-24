@@ -20,7 +20,9 @@ namespace Ecomm.Controllers
             return View(await _context.Categories.Include(c => c.Products).ToListAsync());
         }
 
-        // GET: Categories/Products/5
+        // REMOVE OR COMMENT OUT THIS ACTION TO AVOID CONFLICTS
+        /*
+        // GET: Categories/Products
         public async Task<IActionResult> Products(int? id)
         {
             if (id == null)
@@ -40,7 +42,9 @@ namespace Ecomm.Controllers
             ViewBag.CategoryName = category.Name;
             return View(category.Products);
         }
+        */
 
+        // ... rest of your CategoriesController methods remain the same
         // GET: Categories/Create
         public IActionResult Create()
         {

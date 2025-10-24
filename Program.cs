@@ -9,10 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=ecomm.db"));
 
-// Remove or comment out these lines if they cause errors:
-// builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-// Identity configuration - MUST be before builder.Build()
+// Identity configuration
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
@@ -22,20 +19,16 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequiredLength = 3;
 })
-.AddRoles<IdentityRole>() 
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
 
-var app = builder.Build(); // Everything after this line is middleware configuration
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // Remove or comment out if it causes errors:
-    // app.UseMigrationsEndPoint();
-
-    // Use developer exception page instead
     app.UseDeveloperExceptionPage();
 }
 else
@@ -52,9 +45,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Routes - Use ProductsController for all product browsing
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.MapRazorPages();
 
 // Automatic database creation
@@ -82,7 +77,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// After database creation, add this:
+// Test database connection
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -91,7 +86,6 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.EnsureCreated();
 
-        // Test database connection
         var productCount = context.Products.Count();
         Console.WriteLine($"✅ Database connected! Found {productCount} products.");
     }
@@ -100,6 +94,5 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"❌ Database connection failed: {ex.Message}");
     }
 }
-
 
 app.Run();

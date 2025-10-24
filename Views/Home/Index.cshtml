@@ -35,7 +35,7 @@
 </style>
 
 <!-- Hero Section -->
-<section class="hero-section bg-primary text-white py-5 mb-5">
+<section class="hero-section bg-primary text-white py-5 mb-4">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
@@ -45,7 +45,10 @@
             </div>
             <div class="col-lg-6">
                 <div class="text-center">
-                    <i class="fas fa-shopping-bag fa-10x text-white-50"></i>
+                    <img src="https://www.atamgo.com/wp-content/uploads/2023/07/Ecommerce-Store.jpg"
+                         alt="Online Shopping"
+                         class="img-fluid"
+                         style="max-height: 300px;">
                 </div>
             </div>
         </div>
@@ -73,8 +76,8 @@
 }
 
 <!-- Featured Products -->
-<section class="container mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<section class="container py-1 mb-1">
+    <div class="d-flex justify-content-between align-items-center">
         <h2>Featured Products</h2>
         <a href="@Url.Action("Index", "Products")" class="btn btn-outline-primary">View All</a>
     </div>
@@ -83,7 +86,10 @@
         {
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card h-100 product-card">
-                    <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;">
+                    @{
+                        var featuredPlaceholder = $"https://picsum.photos/300/200?random={product.Id + 100}";
+                    }
+                    <img src="@featuredPlaceholder" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x200/007bff/ffffff?text=Featured+Product'">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">@product.Name</h5>
                         <p class="card-text text-muted flex-grow-1 truncate-3">@product.Description</p>
@@ -108,14 +114,17 @@
 </section>
 
 <!-- New Arrivals -->
-<section class="container mb-5">
+<section class="container mb-2">
     <h2 class="mb-4">New Arrivals</h2>
     <div class="row">
         @foreach (var product in Model.NewArrivals)
         {
             <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
                 <div class="card h-100">
-                    <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height: 120px; object-fit: cover;">
+                    @{
+                        var newArrivalPlaceholder = $"https://picsum.photos/150/120?random={product.Id + 200}";
+                    }
+                    <img src="@newArrivalPlaceholder" class="card-img-top" alt="@product.Name" style="height: 120px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/150x120/28a745/ffffff?text=New+Arrival'">
                     <div class="card-body p-2">
                         <h6 class="card-title small truncate-2">@product.Name</h6>
                         <p class="card-text small text-primary mb-1">@product.Price.ToString("C2")</p>
@@ -128,7 +137,7 @@
 </section>
 
 <!-- Categories -->
-<section class="container mb-5">
+<section class="container mb-3">
     <h2 class="mb-4">Shop by Category</h2>
     <div class="row">
         @foreach (var category in Model.Categories)
@@ -137,12 +146,30 @@
                 <div class="card category-card h-100">
                     <div class="card-body text-center d-flex flex-column">
                         <div class="mb-3">
-                            <i class="fas fa-folder fa-3x text-primary"></i>
+                            @{
+                                var categoryIcon = category.Name.ToLower() switch
+                                {
+                                    "electronics" => "fas fa-laptop",
+                                    "clothing" => "fas fa-tshirt",
+                                    "books" => "fas fa-book",
+                                    "home & garden" => "fas fa-home",
+                                    _ => "fas fa-folder"
+                                };
+                                var categoryColor = category.Name.ToLower() switch
+                                {
+                                    "electronics" => "text-info",
+                                    "clothing" => "text-success",
+                                    "books" => "text-warning",
+                                    "home & garden" => "text-danger",
+                                    _ => "text-primary"
+                                };
+                            }
+                            <i class="@categoryIcon fa-3x @categoryColor"></i>
                         </div>
                         <h5 class="card-title">@category.Name</h5>
                         <p class="card-text text-muted">@category.Products.Count products</p>
                         <div class="mt-auto">
-                            <a href="@Url.Action("Products", "Categories", new { id = category.Id })" class="btn btn-outline-primary">Browse Category</a>
+                            <a href="@Url.Action("Index", "Products", new { categoryId = category.Id })" class="btn btn-outline-primary">Browse Category</a>
                         </div>
                     </div>
                 </div>
