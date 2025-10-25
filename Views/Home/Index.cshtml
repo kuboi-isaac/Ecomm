@@ -87,9 +87,10 @@
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card h-100 product-card">
                     @{
-                        var featuredPlaceholder = $"https://picsum.photos/300/200?random={product.Id + 100}";
+                        // Use actual ImageUrl from database, fallback to placeholder if empty
+                        var imageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : $"https://picsum.photos/300/200?random={product.Id + 100}";
                     }
-                    <img src="@featuredPlaceholder" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x200/007bff/ffffff?text=Featured+Product'">
+                    <img src="@imageUrl" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x200/007bff/ffffff?text=Featured+Product'">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">@product.Name</h5>
                         <p class="card-text text-muted flex-grow-1 truncate-3">@product.Description</p>
@@ -122,9 +123,10 @@
             <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
                 <div class="card h-100">
                     @{
-                        var newArrivalPlaceholder = $"https://picsum.photos/150/120?random={product.Id + 200}";
+                        // Use actual ImageUrl from database, fallback to placeholder if empty
+                        var imageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : $"https://picsum.photos/150/120?random={product.Id + 200}";
                     }
-                    <img src="@newArrivalPlaceholder" class="card-img-top" alt="@product.Name" style="height: 120px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/150x120/28a745/ffffff?text=New+Arrival'">
+                    <img src="@imageUrl" class="card-img-top" alt="@product.Name" style="height: 120px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/150x120/28a745/ffffff?text=New+Arrival'">
                     <div class="card-body p-2">
                         <h6 class="card-title small truncate-2">@product.Name</h6>
                         <p class="card-text small text-primary mb-1">@product.Price.ToString("C2")</p>

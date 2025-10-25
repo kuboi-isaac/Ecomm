@@ -16,7 +16,11 @@
         <!-- Product Image -->
         <div class="col-lg-6 mb-4">
             <div class="card">
-                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="max-height: 500px; object-fit: contain;" onerror="this.src='https://via.placeholder.com/600x500/007bff/ffffff?text=No+Image+Available'">
+                @{
+                    // Use actual ImageUrl from database, fallback to placeholder if empty
+                    var imageUrl = !string.IsNullOrEmpty(Model.ImageUrl) ? Model.ImageUrl : $"https://picsum.photos/600/500?random={Model.Id}";
+                }
+                <img src="@imageUrl" class="card-img-top" alt="@Model.Name" style="max-height: 500px; object-fit: contain;" onerror="this.src='https://via.placeholder.com/600x500/007bff/ffffff?text=No+Image+Available'">
             </div>
         </div>
 
