@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
         .navbar-search {
-            max-width: 400px;
+            max-width: 100px;
         }
 
         .categories-dropdown:hover .dropdown-menu {
@@ -36,18 +36,21 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-2">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">
+                <!-- Brand -->
+                <a class="navbar-brand fw-bold text-primary fs-3" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="fas fa-shopping-bag me-2"></i>Ecomm
                 </a>
 
+                <!-- Mobile Toggle -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
+                <!-- Main Navbar Content -->
                 <div class="collapse navbar-collapse" id="navbarMain">
-                    <!-- Main Navigation -->
+                    <!-- Left Navigation -->
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
@@ -68,14 +71,13 @@
                         </li>
 
                         <!-- Categories Hover Menu -->
-                        <li class="nav-item dropdown categories-dropdown">
+                        <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-list me-1"></i>Categories
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="categoriesDropdown" id="categoriesMenu">
                                 <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">All Categories</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <!-- Categories will be loaded via AJAX -->
                                 <li><div class="dropdown-item text-muted">Loading categories...</div></li>
                             </ul>
                         </li>
@@ -87,9 +89,9 @@
                         </li>
                     </ul>
 
-                    <!-- Search Bar -->
-                    <form class="d-flex navbar-search me-3" method="get" action="@Url.Action("Index", "Products")">
-                        <div class="input-group">
+                    <!-- Search Bar - Made Larger -->
+                    <form class="d-flex navbar-search me-5 flex-grow-2" method="get" action="@Url.Action("Index", "Products")" style="max-width: 500px;">
+                        <div class="input-group w-100">
                             <input class="form-control" type="search" name="searchString" placeholder="Search products..." aria-label="Search">
                             <button class="btn btn-outline-primary" type="submit">
                                 <i class="fas fa-search"></i>
@@ -97,20 +99,22 @@
                         </div>
                     </form>
 
-                    <!-- Cart & User Section -->
+                    <!-- Right Navigation -->
                     <ul class="navbar-nav">
                         <!-- Shopping Cart -->
-                        <li class="nav-item">
+                        <li class="nav-item me-2">
                             <a class="nav-link text-dark position-relative" asp-controller="Cart" asp-action="Index">
                                 <i class="fas fa-shopping-cart fa-lg"></i>
-                                <span class="badge bg-primary rounded-pill cart-count" id="cartCount">0</span>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
+                                    0
+                                </span>
                             </a>
                         </li>
 
                         <!-- User Menu -->
-                        <li class="nav-item dropdown">
+                        <li class="nav-item dropdown me-4">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i>Account
+                                <i class="fas fa-user-circle me-1"></i>Account
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <partial name="_LoginPartial" />
@@ -121,6 +125,110 @@
             </div>
         </nav>
     </header>
+
+    <style>
+        /* Navbar Search Styling */
+        .navbar-search {
+            min-width: 400px;
+        }
+
+            .navbar-search .input-group {
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .navbar-search .form-control {
+                border-right: 0;
+            }
+
+            .navbar-search .btn {
+                border-left: 0;
+            }
+
+        /* Cart Badge Styling */
+        .navbar-nav .nav-link .badge {
+            font-size: 0.7em;
+            padding: 0.25em 0.4em;
+        }
+
+        /* Dropdown Hover Effects */
+        .navbar-nav .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 992px) {
+            .navbar-search {
+                min-width: 250px;
+                max-width: 100%;
+                margin: 10px 0;
+            }
+
+            .navbar-nav .nav-item {
+                margin: 2px 0;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .navbar-search {
+                min-width: 200px;
+            }
+
+            .navbar-collapse {
+                padding: 10px 0;
+            }
+        }
+    </style>
+
+    <script>
+        // Load categories for dropdown menu
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+            updateCartCount();
+        });
+
+        function loadCategories() {
+            fetch('/Categories/GetCategoriesMenu')
+                .then(response => response.json())
+                .then(categories => {
+                    const categoriesMenu = document.getElementById('categoriesMenu');
+                    if (categoriesMenu && categories.length > 0) {
+                        // Clear loading message
+                        categoriesMenu.innerHTML = '<li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">All Categories</a></li><li><hr class="dropdown-divider"></li>';
+
+                        // Add categories
+                        categories.forEach(category => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `<a class="dropdown-item" href="/Products?categoryId=${category.id}">${category.name} <span class="text-muted small">(${category.productCount})</span></a>`;
+                            categoriesMenu.appendChild(li);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading categories:', error);
+                });
+        }
+
+        function updateCartCount() {
+            fetch('/Cart/GetCartCount')
+                .then(response => response.json())
+                .then(data => {
+                    const cartCount = document.getElementById('cartCount');
+                    if (cartCount) {
+                        cartCount.textContent = data.count;
+                        // Hide badge if count is 0
+                        if (data.count === 0) {
+                            cartCount.style.display = 'none';
+                        } else {
+                            cartCount.style.display = 'block';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating cart count:', error);
+                });
+        }
+    </script>
 
     <div class="container">
         <!-- Notification Messages -->

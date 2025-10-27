@@ -4,6 +4,7 @@ using Ecomm.Models;
 using Ecomm.Data;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace Ecomm.Controllers
 {
@@ -11,15 +12,22 @@ namespace Ecomm.Controllers
     public class CartController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public CartController(ApplicationDbContext context)
+        public CartController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         private string GetUserId()
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        }
+
+        private string GetCurrentUserId()
+        {
+            return _userManager.GetUserId(User);
         }
 
         // GET: Cart
@@ -37,6 +45,9 @@ namespace Ecomm.Controllers
                 CartItems = cartItems,
                 TotalAmount = cartItems.Sum(item => item.Product!.Price * item.Quantity)
             };
+
+            // Set cart count for navbar
+            ViewBag.CartCount = cartItems.Sum(item => item.Quantity);
 
             return View(viewModel);
         }
@@ -64,6 +75,12 @@ namespace Ecomm.Controllers
 
             if (existingCartItem != null)
             {
+                // Check if total quantity exceeds stock
+                if (existingCartItem.Quantity + quantity > product.StockCount)
+                {
+                    TempData["Error"] = $"Cannot add more items. Only {product.StockCount} available in stock.";
+                    return RedirectToAction("Details", "Products", new { id = productId });
+                }
                 existingCartItem.Quantity += quantity;
             }
             else
@@ -86,52 +103,85 @@ namespace Ecomm.Controllers
         [HttpPost]
         public async Task<JsonResult> UpdateQuantity(int cartItemId, int quantity)
         {
-            var userId = GetUserId();
-            var cartItem = await _context.CartItems
-                .Include(c => c.Product)
-                .FirstOrDefaultAsync(c => c.Id == cartItemId && c.UserId == userId);
+            try
+            {
+                var userId = GetUserId();
+                var cartItem = await _context.CartItems
+                    .Include(ci => ci.Product)
+                    .FirstOrDefaultAsync(ci => ci.Id == cartItemId && ci.UserId == userId);
 
-            if (cartItem == null)
-            {
-                return Json(new { success = false, message = "Cart item not found" });
-            }
-
-            if (quantity <= 0)
-            {
-                _context.CartItems.Remove(cartItem);
-            }
-            else
-            {
-                if (cartItem.Product!.StockCount < quantity)
+                if (cartItem != null)
                 {
-                    return Json(new { success = false, message = $"Only {cartItem.Product.StockCount} items available." });
+                    // Validate quantity doesn't exceed stock
+                    if (quantity > cartItem.Product.StockCount)
+                    {
+                        return Json(new { success = false, message = "Quantity exceeds available stock" });
+                    }
+
+                    cartItem.Quantity = quantity;
+                    await _context.SaveChangesAsync();
+
+                    // Calculate updated totals
+                    var cartItems = await _context.CartItems
+                        .Include(ci => ci.Product)
+                        .Where(ci => ci.UserId == userId)
+                        .ToListAsync();
+
+                    var totalAmount = cartItems.Sum(ci => ci.Product.Price * ci.Quantity);
+                    var cartCount = cartItems.Sum(ci => ci.Quantity);
+
+                    return Json(new
+                    {
+                        success = true,
+                        itemTotal = (cartItem.Product.Price * quantity).ToString("C2"),
+                        totalAmount = totalAmount.ToString("C2"),
+                        cartCount = cartCount
+                    });
                 }
-                cartItem.Quantity = quantity;
+
+                return Json(new { success = false, message = "Item not found" });
             }
-
-            await _context.SaveChangesAsync();
-
-            var updatedCartItems = await _context.CartItems
-                .Where(c => c.UserId == userId)
-                .Include(c => c.Product)
-                .ToListAsync();
-
-            var totalAmount = updatedCartItems.Sum(item => item.Product!.Price * item.Quantity);
-            var itemTotal = cartItem?.Product!.Price * (quantity > 0 ? quantity : 0) ?? 0;
-
-            return Json(new
+            catch (Exception ex)
             {
-                success = true,
-                totalAmount = totalAmount.ToString("C2"),
-                itemTotal = itemTotal.ToString("C2"),
-                cartCount = updatedCartItems.Sum(item => item.Quantity)
-            });
+                return Json(new { success = false, message = "Error updating quantity" });
+            }
         }
 
-        // POST: Cart/RemoveFromCart
+        // POST: Cart/RemoveFromCart (AJAX version)
+        [HttpPost]
+        public async Task<JsonResult> RemoveFromCart(int cartItemId)
+        {
+            try
+            {
+                var userId = GetUserId();
+                var cartItem = await _context.CartItems
+                    .FirstOrDefaultAsync(ci => ci.Id == cartItemId && ci.UserId == userId);
+
+                if (cartItem != null)
+                {
+                    _context.CartItems.Remove(cartItem);
+                    await _context.SaveChangesAsync();
+
+                    // Get updated cart count
+                    var cartCount = await _context.CartItems
+                        .Where(c => c.UserId == userId)
+                        .SumAsync(c => c.Quantity);
+
+                    return Json(new { success = true, cartCount = cartCount });
+                }
+
+                return Json(new { success = false, message = "Item not found" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error removing item" });
+            }
+        }
+
+        // POST: Cart/RemoveFromCart (Redirect version)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveFromCart(int cartItemId)
+        public async Task<IActionResult> RemoveFromCartRedirect(int cartItemId)
         {
             var userId = GetUserId();
             var cartItem = await _context.CartItems
@@ -162,6 +212,26 @@ namespace Ecomm.Controllers
                 .SumAsync(c => c.Quantity);
 
             return Json(new { count = count });
+        }
+
+        // POST: Cart/ClearCart
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ClearCart()
+        {
+            var userId = GetUserId();
+            var cartItems = await _context.CartItems
+                .Where(c => c.UserId == userId)
+                .ToListAsync();
+
+            if (cartItems.Any())
+            {
+                _context.CartItems.RemoveRange(cartItems);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Cart cleared successfully!";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 
