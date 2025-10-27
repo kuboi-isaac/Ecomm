@@ -32,101 +32,194 @@
         .navbar-nav .nav-link {
             padding: 0.5rem 1rem;
         }
+
+        <style>
+    /* Button color override */
+    .btn-primary {
+        background-color: #1E90FF !important;
+        border-color: #1E90FF !important;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active {
+        background-color: #1C86EE !important;
+        border-color: #1C86EE !important;
+    }
+
+    .btn-outline-primary {
+        color: #1E90FF !important;
+        border-color: #1E90FF !important;
+    }
+
+    .btn-outline-primary:hover,
+    .btn-outline-primary:focus,
+    .btn-outline-primary:active {
+        background-color: #1E90FF !important;
+        border-color: #1E90FF !important;
+        color: white !important;
+    }
+
+    /* Also update badge colors if needed */
+    .badge.bg-primary {
+        background-color: #1E90FF !important;
+    }
+
+    /* Update navbar brand color */
+    .navbar-brand.text-primary {
+        color: #1E90FF !important;
+    }
+
+    /* Update text-primary utility class */
+    .text-primary {
+        color: #1E90FF !important;
+    }
+</style>
     </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-2">
-            <div class="container-fluid">
-                <!-- Brand -->
-                <a class="navbar-brand fw-bold text-primary fs-3" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-shopping-bag me-2"></i>Ecomm
-                </a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-2">
+        <div class="container-fluid">
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                <!-- Mobile Toggle -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+            <!-- Main Navbar Content -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <!-- Left Navigation -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-home me-4"></i>Home
+                        </a>
+                    </li>
 
-                <!-- Main Navbar Content -->
-                <div class="collapse navbar-collapse" id="navbarMain">
-                    <!-- Left Navigation -->
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home me-1"></i>Home
-                            </a>
-                        </li>
+                    <!-- Products Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-box me-5"></i>Products
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+                            <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">All Products</a></li>
+                            <li><a class="dropdown-item" asp-controller="Products" asp-action="Create">Add New Product</a></li>
+                            <li><a class="dropdown-item" asp-controller="Products" asp-action="LowStock">Low Stock Alerts</a></li>
+                        </ul>
+                    </li>
 
-                        <!-- Products Dropdown -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-box me-1"></i>Products
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="productsDropdown">
-                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">All Products</a></li>
-                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Create">Add New Product</a></li>
-                                <li><a class="dropdown-item" asp-controller="Products" asp-action="LowStock">Low Stock Alerts</a></li>
-                            </ul>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-controller="Checkout" asp-action="OrderHistory">
+                            <i class="fas fa-history me-5"></i>Order History
+                        </a>
+                    </li>
+                </ul>
 
-                        <!-- Categories Hover Menu -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-list me-1"></i>Categories
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="categoriesDropdown" id="categoriesMenu">
-                                <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">All Categories</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><div class="dropdown-item text-muted">Loading categories...</div></li>
-                            </ul>
-                        </li>
+                <!-- Search Bar -->
+                <form class="d-flex navbar-search mx-4 flex-grow-1" method="get" action="@Url.Action("Index", "Products")" style="max-width: 600px; min-width: 400px;">
+                    <div class="input-group w-100">
+                        <input class="form-control form-control-lg" type="search" name="searchString" placeholder="Search products..." aria-label="Search" style="font-size: 1rem;">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Checkout" asp-action="OrderHistory">
-                                <i class="fas fa-history me-1"></i>Order History
-                            </a>
-                        </li>
-                    </ul>
+                <!-- Right Navigation -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Theme Toggle -->
+                    <li class="nav-item me-3">
+                        <button class="btn btn-outline-secondary theme-toggle" id="themeToggle" title="Toggle theme">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
+                    </li>
 
-                    <!-- Search Bar - Made Larger -->
-                    <form class="d-flex navbar-search me-5 flex-grow-2" method="get" action="@Url.Action("Index", "Products")" style="max-width: 500px;">
-                        <div class="input-group w-100">
-                            <input class="form-control" type="search" name="searchString" placeholder="Search products..." aria-label="Search">
-                            <button class="btn btn-outline-primary" type="submit">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
+                    <!-- Shopping Cart -->
+                    <li class="nav-item me-3">
+                        <a class="nav-link text-dark position-relative" asp-controller="Cart" asp-action="Index">
+                            <i class="fas fa-shopping-cart fa-lg"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
+                                0
+                            </span>
+                        </a>
+                    </li>
 
-                    <!-- Right Navigation -->
-                    <ul class="navbar-nav">
-                        <!-- Shopping Cart -->
-                        <li class="nav-item me-2">
-                            <a class="nav-link text-dark position-relative" asp-controller="Cart" asp-action="Index">
-                                <i class="fas fa-shopping-cart fa-lg"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
-                                    0
-                                </span>
-                            </a>
-                        </li>
-
-                        <!-- User Menu -->
-                        <li class="nav-item dropdown me-4">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle me-1"></i>Account
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <partial name="_LoginPartial" />
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
+                    <!-- User Menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>Account
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <partial name="_LoginPartial" />
+                        </ul>
+                    </li>
+                </ul>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>
 
     <style>
+        :root {
+    /* Light Theme (Default) */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --navbar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --shadow: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    /* Dark Theme */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-color: #404040;
+    --navbar-bg: #2d2d2d;
+    --card-bg: #2d2d2d;
+    --shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* Apply theme variables */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.navbar {
+    background-color: var(--navbar-bg) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+.nav-link.text-dark {
+    color: var(--text-primary) !important;
+}
+
+.form-control {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.dropdown-menu {
+    background-color: var(--navbar-bg);
+    border-color: var(--border-color);
+}
+
+.dropdown-item {
+    color: var(--text-primary);
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
         /* Navbar Search Styling */
         .navbar-search {
             min-width: 400px;
@@ -181,6 +274,34 @@
     </style>
 
     <script>
+        // Theme switching functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+
+    // Apply saved theme
+    if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeIcon.className = 'fas fa-sun';
+    }
+
+    // Theme toggle event
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        
+        if (currentTheme === 'dark') {
+            document.documentElement.removeAttribute('data-theme');
+            themeIcon.className = 'fas fa-moon';
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeIcon.className = 'fas fa-sun';
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+});
+
         // Load categories for dropdown menu
         document.addEventListener('DOMContentLoaded', function() {
             loadCategories();

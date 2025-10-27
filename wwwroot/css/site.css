@@ -1,3 +1,40 @@
+:root {
+    --bs-primary: #1E90FF;
+    --bs-primary-rgb: 30, 144, 255;
+    --bs-btn-bg: #1E90FF;
+    --bs-btn-border-color: #1E90FF;
+    --bs-btn-hover-bg: #1C86EE;
+    --bs-btn-hover-border-color: #1C86EE;
+    --bs-btn-active-bg: #1C86EE;
+    --bs-btn-active-border-color: #1C86EE;
+}
+
+.btn-primary {
+    background-color: #1E90FF !important;
+    border-color: #1E90FF !important;
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active {
+        background-color: #1C86EE !important;
+        border-color: #1C86EE !important;
+    }
+
+.btn-outline-primary {
+    color: #1E90FF !important;
+    border-color: #1E90FF !important;
+}
+
+    .btn-outline-primary:hover,
+    .btn-outline-primary:focus,
+    .btn-outline-primary:active {
+        background-color: #1E90FF !important;
+        border-color: #1E90FF !important;
+        color: white !important;
+    }
+
+
 html {
   font-size: 14px;
 }

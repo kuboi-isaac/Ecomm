@@ -30,13 +30,13 @@
     }
 
     .hero-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #000000 0%, #1E90FF 100%);
     }
 </style>
 
 <!-- Hero Section -->
-<section class="hero-section bg-primary text-white py-5 mb-4">
-    <div class="container">
+<section class="hero-section bg-primary text-white py-3 mb-5">
+    <div class="container rounded-0">
         <div class="row align-items-center">
             <div class="col-lg-6">
                 <h1 class="display-4 fw-bold">Welcome to Our E-Commerce Store</h1>
@@ -44,16 +44,63 @@
                 <a href="@Url.Action("Index", "Products")" class="btn btn-light btn-lg mt-3">Shop Now</a>
             </div>
             <div class="col-lg-6">
-                <div class="text-center">
-                    <img src="https://www.atamgo.com/wp-content/uploads/2023/07/Ecommerce-Store.jpg"
-                         alt="Online Shopping"
-                         class="img-fluid"
-                         style="max-height: 300px;">
+                <!-- Simple Product Image Carousel -->
+                <div id="productImageCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner rounded-3 shadow-lg">
+                        @if (Model.FeaturedProducts.Any())
+                        {
+                            @for (int i = 0; i < Model.FeaturedProducts.Count && i < 5; i++)
+                            {
+                                var product = Model.FeaturedProducts[i];
+                                var imageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : $"https://picsum.photos/500/400?random={product.Id}";
+
+                                <div class="carousel-item @(i == 0 ? "active" : "") position-relative">
+                                    <img src="@imageUrl" class="d-block w-100 rounded-3" alt="@product.Name"
+                                         style="height: 300px; object-fit: cover;"
+                                         onerror="this.src='https://via.placeholder.com/500x400/007bff/ffffff?text=Product+Image'">
+                                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
+                                        <h5>@product.Name</h5>
+                                        <p class="mb-1">@product.Price.ToString("C2")</p>
+                                        <a href="@Url.Action("Details", "Products", new { id = product.Id })"
+                                           class="btn btn-primary btn-sm">View</a>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="carousel-item active">
+                                <img src="https://www.atamgo.com/wp-content/uploads/2023/07/Ecommerce-Store.jpg"
+                                     class="d-block w-100 rounded-3" alt="Ecommerce Store"
+                                     style="height: 400px; object-fit: cover;">
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize simple image carousel
+        var imageCarousel = new bootstrap.Carousel(document.getElementById('productImageCarousel'), {
+            interval: 5000, // 5 seconds
+            wrap: true
+        });
+    });
+</script>
 
 <!-- Low Stock Alerts -->
 @if (Model.LowStockAlerts.Any())
