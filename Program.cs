@@ -1,13 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Ecomm.Data;
+﻿using Ecomm.Data;
+using Ecomm.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// ✅ CHANGED: Switch from SQLite to PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite("Data Source=ecomm.db"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Identity configuration
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
@@ -23,6 +25,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
+// Add User Registration Service
+builder.Services.AddScoped<UserRegistrationService>();
 
 var app = builder.Build();
 
@@ -52,46 +56,82 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-// Automatic database creation
+// ✅ CHANGED: Better database initialization for PostgreSQL
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        bool created = context.Database.EnsureCreated();
 
-        if (created)
+        // For PostgreSQL, use migrations instead of EnsureCreated
+        context.Database.Migrate(); // This applies any pending migrations
+
+        Console.WriteLine("✅ PostgreSQL database migrated successfully!");
+
+        // Test the connection with a simple query
+        var canConnect = context.Database.CanConnect();
+        if (canConnect)
         {
-            Console.WriteLine("✅ Database and tables created successfully!");
-        }
-        else
-        {
-            Console.WriteLine("ℹ️ Database already exists.");
+            Console.WriteLine("✅ Successfully connected to PostgreSQL!");
+
+            // Optional: Count products if you have that table
+            // var productCount = context.Products?.Count() ?? 0;
+            // Console.WriteLine($"📊 Found {productCount} products in database.");
         }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "❌ An error occurred while creating the database.");
+        logger.LogError(ex, "❌ An error occurred while setting up the database.");
+        Console.WriteLine($"❌ Database error: {ex.Message}");
     }
 }
 
-// Test database connection
+// Create admin role and auto-assign first user
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.EnsureCreated();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
-        var productCount = context.Products.Count();
-        Console.WriteLine($"✅ Database connected! Found {productCount} products.");
+        // Create Admin role if it doesn't exist
+        if (!await roleManager.RoleExistsAsync("Admin"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Admin"));
+            Console.WriteLine("✅ Admin role created!");
+        }
+
+        // Check if any users exist
+        var existingUsers = await userManager.Users.ToListAsync();
+
+        if (!existingUsers.Any())
+        {
+            Console.WriteLine("👤 No users found. First registered user will become Admin.");
+        }
+        else
+        {
+            // Check if any admin exists
+            var adminUsers = await userManager.GetUsersInRoleAsync("Admin");
+            if (!adminUsers.Any())
+            {
+                // Make the first user admin
+                var firstUser = existingUsers.First();
+                await userManager.AddToRoleAsync(firstUser, "Admin");
+                Console.WriteLine($"✅ First user '{firstUser.Email}' automatically assigned Admin role!");
+            }
+            else
+            {
+                Console.WriteLine($"✅ Admin users exist: {string.Join(", ", adminUsers.Select(u => u.Email))}");
+            }
+        }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Database connection failed: {ex.Message}");
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "❌ An error occurred setting up admin role.");
     }
 }
 
