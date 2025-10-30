@@ -18,16 +18,24 @@
         overflow: hidden;
     }
 
-    .product-card:hover {
-        transform: translateY(-5px);
-        transition: transform 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    .product-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
     }
 
-    .category-card:hover {
-        background-color: #f8f9fa;
-        transition: background-color 0.3s ease;
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+    .category-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
 
     .hero-section {
         background: linear-gradient(135deg, #000000 0%, #1E90FF 100%);
@@ -41,7 +49,7 @@
     }
 
         .feature-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-5px);
             box-shadow: var(--shadow-lg);
             border-color: var(--accent-primary);
         }
@@ -50,11 +58,56 @@
                 transform: scale(1.1);
                 transition: transform 0.3s ease;
             }
+
+    /* Consistent font sizes */
+    .card-title {
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-text {
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    .price-text {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .card-badge {
+        font-size: 11px;
+    }
+
+    .category-text {
+        font-size: 11px;
+    }
+
+    .btn-sm-custom {
+        font-size: 12px;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .stock-text {
+        font-size: 11px;
+    }
+
+    .clickable-card {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+        .clickable-card:hover {
+            color: inherit;
+            text-decoration: none;
+        }
 </style>
 
 <!-- Hero Section -->
 <section class="hero-section bg-primary text-white py-3 mb-5">
-    <div class="container rounded-0">
+    <div class="container rounded-3">
         <div class="row align-items-center">
             <div class="col-lg-6">
                 <h1 class="display-4 fw-bold">Welcome to Our E-Commerce Store</h1>
@@ -125,13 +178,14 @@
 {
     <div class="container mb-5">
         <div class="alert alert-warning">
-            <h4><i class="fas fa-exclamation-triangle"></i> Low Stock Alerts</h4>
+            <h4 class="mb-3"><i class="fas fa-exclamation-triangle"></i> Low Stock Alerts</h4>
             <div class="row">
                 @foreach (var product in Model.LowStockAlerts)
                 {
                     <div class="col-md-4 mb-2">
                         <a href="@Url.Action("Details", "Products", new { id = product.Id })" class="text-decoration-none">
-                            <strong>@product.Name</strong> - Only @product.StockCount left!
+                            <strong style="font-size: 13px;">@product.Name</strong>
+                            <span style="font-size: 12px;" class="text-danger">- Only @product.StockCount left!</span>
                         </a>
                     </div>
                 }
@@ -141,35 +195,41 @@
 }
 
 <!-- Featured Products -->
-<section class="container py-1 mb-1">
-    <div class="d-flex justify-content-between align-items-center">
+<section class="container py-1 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Featured Products</h2>
-        <a href="@Url.Action("Index", "Products")" class="btn btn-outline-primary">View All</a>
+        <a href="@Url.Action("Index", "Products")" class="btn btn-outline-primary btn-sm-custom">View All</a>
     </div>
     <div class="row">
         @foreach (var product in Model.FeaturedProducts)
         {
-            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                <div class="card h-100 product-card">
+            <div class="col">
+                <div class="card h-100 product-card" onclick="window.location.href='@Url.Action("Details", "Products", new { id = product.Id })'">
                     @{
-                        // Use actual ImageUrl from database, fallback to placeholder if empty
                         var imageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : $"https://picsum.photos/300/200?random={product.Id + 100}";
                     }
-                    <img src="@imageUrl" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x200/007bff/ffffff?text=Featured+Product'">
+                    <img src="@imageUrl" class="card-img-top" alt="@product.Name" style="height: 180px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x180/007bff/ffffff?text=Featured+Product'">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">@product.Name</h5>
                         <p class="card-text text-muted flex-grow-1 truncate-3">@product.Description</p>
                         <div class="mt-auto">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="h5 text-primary mb-0">@product.Price.ToString("C2")</span>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="price-text text-primary">@product.Price.ToString("C2")</span>
                                 @if (product.IsOnSale)
                                 {
-                                    <span class="badge bg-danger">Sale</span>
+                                    <span class="badge bg-danger card-badge">Sale</span>
                                 }
                             </div>
-                            <div class="d-flex justify-content-between align-items-center mt-2">
-                                <span class="text-muted small">Stock: @product.StockCount</span>
-                                <a href="@Url.Action("Details", "Products", new { id = product.Id })" class="btn btn-primary btn-sm">View Details</a>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge card-badge @(product.StockCount > 0 ? "bg-success" : "bg-danger")">
+                                    @(product.StockCount > 0 ? $"{product.StockCount} in stock" : "Out of stock")
+                                </span>
+                                <small class="text-muted category-text">@(product.Category?.Name ?? "Uncategorized")</small>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="@Url.Action("Details", "Products", new { id = product.Id })" class="btn btn-primary btn-sm-custom" onclick="event.stopPropagation()">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -181,21 +241,42 @@
 
 <!-- New Arrivals -->
 <section class="container mb-2">
-    <h2 class="mb-4">New Arrivals</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>New Arrivals</h2>
+        <a href="@Url.Action("Index", "Products")" class="btn btn-outline-primary btn-sm-custom">View All</a>
+    </div>
     <div class="row">
         @foreach (var product in Model.NewArrivals)
         {
-            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
-                <div class="card h-100">
+            <div class="col-xl-4">
+                <div class="card h-100 product-card" onclick="window.location.href='@Url.Action("Details", "Products", new { id = product.Id })'">
                     @{
-                        // Use actual ImageUrl from database, fallback to placeholder if empty
-                        var imageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : $"https://picsum.photos/150/120?random={product.Id + 200}";
+                        var imageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : $"https://picsum.photos/300/200?random={product.Id + 200}";
                     }
-                    <img src="@imageUrl" class="card-img-top" alt="@product.Name" style="height: 120px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/150x120/28a745/ffffff?text=New+Arrival'">
-                    <div class="card-body p-2">
-                        <h6 class="card-title small truncate-2">@product.Name</h6>
-                        <p class="card-text small text-primary mb-1">@product.Price.ToString("C2")</p>
-                        <a href="@Url.Action("Details", "Products", new { id = product.Id })" class="btn btn-outline-primary btn-sm w-100">View</a>
+                    <img src="@imageUrl" class="card-img-top" alt="@product.Name" style="height: 180px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x180/28a745/ffffff?text=New+Arrival'">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text text-muted flex-grow-1 truncate-3">@product.Description</p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="price-text text-primary">@product.Price.ToString("C2")</span>
+                                @if (product.IsOnSale)
+                                {
+                                    <span class="badge bg-danger card-badge">Sale</span>
+                                }
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge card-badge @(product.StockCount > 0 ? "bg-success" : "bg-danger")">
+                                    @(product.StockCount > 0 ? $"{product.StockCount} in stock" : "Out of stock")
+                                </span>
+                                <small class="text-muted category-text">@(product.Category?.Name ?? "Uncategorized")</small>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="@Url.Action("Details", "Products", new { id = product.Id })" class="btn btn-primary btn-sm-custom" onclick="event.stopPropagation()">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -204,13 +285,13 @@
 </section>
 
 <!-- Categories -->
-<section class="container mb-3">
+<section class="container mb-5">
     <h2 class="mb-4">Shop by Category</h2>
     <div class="row">
         @foreach (var category in Model.Categories)
         {
-            <div class="col mb-4">
-                <div class="card category-card h-80 w-60">
+            <div class="col">
+                <div class="card h-100 category-card" onclick="window.location.href='@Url.Action("Index", "Products", new { categoryId = category.Id })'">
                     <div class="card-body text-center d-flex flex-column">
                         <div class="mb-3">
                             @{
@@ -231,12 +312,14 @@
                                     _ => "text-primary"
                                 };
                             }
-                            <i class="@categoryIcon fa-3x @categoryColor"></i>
+                            <i class="@categoryIcon fa-2x @categoryColor"></i>
                         </div>
                         <h5 class="card-title">@category.Name</h5>
-                        <p class="card-text text-muted">@category.Products.Count products</p>
+                        <p class="card-text text-muted" style="font-size: 12px;">@category.Products.Count products</p>
                         <div class="mt-auto">
-                            <a href="@Url.Action("Index", "Products", new { categoryId = category.Id })" class="btn btn-outline-primary">Browse Category</a>
+                            <a href="@Url.Action("Index", "Products", new { categoryId = category.Id })" class="btn btn-outline-primary btn-sm-custom" onclick="event.stopPropagation()">
+                                Browse Category
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -249,39 +332,60 @@
 <section class="special-deals-section py-5">
     <div class="container">
         <div class="row text-center">
-            <div class="col-md-4 mb-4">
+            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
                 <div class="feature-card card h-100 border-0">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <div class="mb-3">
-                            <i class="fas fa-shipping-fast fa-3x text-primary"></i>
+                            <i class="fas fa-shipping-fast fa-2x text-primary"></i>
                         </div>
                         <h5 class="card-title">Free Shipping</h5>
-                        <p class="card-text deals-text">Free shipping on orders over $50</p>
+                        <p class="card-text deals-text flex-grow-1" style="font-size: 12px;">Free shipping on orders over $50</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
+            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
                 <div class="feature-card card h-100 border-0">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <div class="mb-3">
-                            <i class="fas fa-undo-alt fa-3x text-primary"></i>
+                            <i class="fas fa-undo-alt fa-2x text-primary"></i>
                         </div>
                         <h5 class="card-title">Easy Returns</h5>
-                        <p class="card-text deals-text">30-day return policy</p>
+                        <p class="card-text deals-text flex-grow-1" style="font-size: 12px;">30-day return policy</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
+            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
                 <div class="feature-card card h-100 border-0">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <div class="mb-3">
-                            <i class="fas fa-lock fa-3x text-primary"></i>
+                            <i class="fas fa-lock fa-2x text-primary"></i>
                         </div>
                         <h5 class="card-title">Secure Payment</h5>
-                        <p class="card-text deals-text">Your payment information is safe</p>
+                        <p class="card-text deals-text flex-grow-1" style="font-size: 12px;">Your payment information is safe</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    // Make cards clickable
+    document.addEventListener('DOMContentLoaded', function() {
+        const productCards = document.querySelectorAll('.product-card, .category-card');
+
+        productCards.forEach(card => {
+            card.style.cursor = 'pointer';
+            card.setAttribute('tabindex', '0');
+
+            card.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const onclickAttr = this.getAttribute('onclick');
+                    if (onclickAttr) {
+                        eval(onclickAttr);
+                    }
+                }
+            });
+        });
+    });
+</script>
