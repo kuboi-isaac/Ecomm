@@ -60,19 +60,28 @@
             padding: 0.25rem 0.5rem;
         }
 
-    .clickable-area {
-        text-decoration: none;
-        color: inherit;
-        display: block;
+    .loading-spinner {
+        display: none;
+        width: 16px;
+        height: 16px;
     }
 
-        .clickable-area:hover {
-            color: inherit;
-            text-decoration: none;
-        }
+    /* Toast styles */
+    .toast {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: var(--shadow-lg);
+    }
 
-    .non-clickable {
-        pointer-events: none;
+    .toast-header {
+        background-color: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .toast-body {
+        background-color: var(--card-bg);
+        color: var(--text-primary);
     }
 </style>
 
@@ -171,21 +180,21 @@
                                             <small class="text-muted category-text">@(product.Category?.Name ?? "Uncategorized")</small>
                                         </div>
 
-                                        <!-- Add to Cart Button -->
+                                        <!-- Add to Cart Button - FIXED AJAX VERSION -->
                                         <div class="d-grid gap-2">
                                             @if (product.StockCount > 0)
                                             {
-                                                <form method="post" action="@Url.Action("AddToCart", "Cart")" class="add-to-cart-form">
-                                                    <input type="hidden" name="productId" value="@product.Id" />
-                                                    <input type="hidden" name="quantity" value="1" />
-                                                    <button type="submit" class="btn btn-primary w-100 add-to-cart-btn" onclick="event.stopPropagation()">
-                                                        <i class="fas fa-cart-plus"></i> Add to Cart
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="btn btn-primary add-to-cart-btn"
+                                                        onclick="addToCart(@product.Id, event)">
+                                                    <i class="fas fa-cart-plus"></i> Add to Cart
+                                                    <div class="spinner-border spinner-border-sm loading-spinner" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                </button>
                                             }
                                             else
                                             {
-                                                <button class="btn btn-secondary w-100 add-to-cart-btn" disabled onclick="event.stopPropagation()">
+                                                <button class="btn btn-secondary add-to-cart-btn" disabled>
                                                     <i class="fas fa-cart-plus"></i> Out of Stock
                                                 </button>
                                             }
@@ -216,40 +225,117 @@
     </div>
 </div>
 
-<script>
-    // Enhanced click handling
-    document.addEventListener('DOMContentLoaded', function() {
-        const productCards = document.querySelectorAll('.product-card');
+<!-- Toast Notification -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-shopping-cart text-primary me-2"></i>
+            <strong class="me-auto">Cart</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Product added to cart!
+        </div>
+    </div>
+</div>
 
-        productCards.forEach(card => {
-            // Make the entire card clickable (except for buttons/forms)
-            card.style.cursor = 'pointer';
+@section Scripts {
+    <script>
+        // Add to Cart function with AJAX
+        async function addToCart(productId, event) {
+            event.stopPropagation(); // Prevent card click
 
-            // Add enter key support for accessibility
-            card.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    const clickableElement = this.querySelector('[onclick]');
-                    if (clickableElement) {
-                        const onclickAttr = clickableElement.getAttribute('onclick');
+            const button = event.target.closest('button');
+            const spinner = button.querySelector('.loading-spinner');
+
+            // Show loading state
+            button.disabled = true;
+            spinner.style.display = 'inline-block';
+            button.querySelector('i').style.display = 'none';
+
+            try {
+                // Get anti-forgery token
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                const response = await fetch('/Cart/AddToCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: 1
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success message as toast notification
+                    showToast(result.message);
+
+                    // Update cart count in navbar
+                    updateCartCount(result.cartCount);
+                } else {
+                    // Show error message
+                    showToast(result.message || 'Error adding product to cart', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Network error. Please try again.', 'error');
+            } finally {
+                // Restore button state
+                button.disabled = false;
+                spinner.style.display = 'none';
+                button.querySelector('i').style.display = 'inline-block';
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toastElement = document.getElementById('cartToast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            toastMessage.textContent = message;
+
+            // Set background color based on type
+            if (type === 'error') {
+                toastElement.querySelector('.toast-header').classList.add('bg-danger', 'text-white');
+            } else {
+                toastElement.querySelector('.toast-header').classList.remove('bg-danger', 'text-white');
+            }
+
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+
+        // Update cart count in navbar
+        function updateCartCount(count) {
+            const cartCountElement = document.getElementById('cartCount');
+            if (cartCountElement) {
+                cartCountElement.textContent = count;
+                cartCountElement.style.display = count > 0 ? 'block' : 'none';
+            }
+        }
+
+        // Make cards clickable
+        document.addEventListener('DOMContentLoaded', function() {
+            const productCards = document.querySelectorAll('.product-card');
+
+            productCards.forEach(card => {
+                card.style.cursor = 'pointer';
+                card.setAttribute('tabindex', '0');
+
+                card.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const onclickAttr = this.getAttribute('onclick');
                         if (onclickAttr) {
                             eval(onclickAttr);
                         }
                     }
-                }
-            });
-
-            // Set tabindex for accessibility
-            card.setAttribute('tabindex', '0');
-        });
-
-        // Handle form submissions
-        const addToCartForms = document.querySelectorAll('.add-to-cart-form');
-        addToCartForms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.stopPropagation();
-                // Optional: Add AJAX submission here for better UX
-                // this.submit(); // This will submit the form normally
+                });
             });
         });
-    });
-</script>
+    </script>
+}
