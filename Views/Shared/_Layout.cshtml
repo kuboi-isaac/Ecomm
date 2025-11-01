@@ -421,6 +421,216 @@
             ::-webkit-scrollbar-thumb:hover {
                 background: var(--accent-secondary);
             }
+        /* Enhanced Alert Styles */
+        .custom-alert {
+            position: relative;
+            border: none;
+            border-radius: 12px;
+            padding: 0;
+            margin: 1rem 0;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid;
+            animation: slideInDown 0.5s ease-out;
+            z-index: 1055; /* Above everything */
+        }
+
+            /* Light Theme (Default) */
+            .custom-alert.alert-success {
+                background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                border-left-color: #28a745;
+                color: #155724;
+            }
+
+            .custom-alert.alert-danger {
+                background: linear-gradient(135deg, #f8d7da 0%, #f1b0b7 100%);
+                border-left-color: #dc3545;
+                color: #721c24;
+            }
+
+            .custom-alert.alert-info {
+                background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+                border-left-color: #17a2b8;
+                color: #0c5460;
+            }
+
+            .custom-alert.alert-warning {
+                background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+                border-left-color: #ffc107;
+                color: #856404;
+            }
+
+        /* Dark Theme */
+        [data-theme="dark"] .custom-alert.alert-success {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.2) 0%, rgba(40, 167, 69, 0.1) 100%);
+            border-left-color: #28a745;
+            color: #90ee90;
+        }
+
+        [data-theme="dark"] .custom-alert.alert-danger {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(220, 53, 69, 0.1) 100%);
+            border-left-color: #dc3545;
+            color: #ff6b6b;
+        }
+
+        [data-theme="dark"] .custom-alert.alert-info {
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.2) 0%, rgba(23, 162, 184, 0.1) 100%);
+            border-left-color: #17a2b8;
+            color: #6df7ff;
+        }
+
+        [data-theme="dark"] .custom-alert.alert-warning {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 193, 7, 0.1) 100%);
+            border-left-color: #ffc107;
+            color: #ffd54f;
+        }
+
+        /* Alert Content Layout */
+        .alert-content {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            gap: 1rem;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .alert-message {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+            .alert-message strong {
+                font-size: 1rem;
+                font-weight: 600;
+            }
+
+            .alert-message span {
+                font-size: 0.9rem;
+                opacity: 0.9;
+            }
+
+        /* Custom Close Button */
+        .custom-close {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 50%;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .custom-close:hover {
+                opacity: 1;
+                background: rgba(0, 0, 0, 0.1);
+                transform: scale(1.1);
+            }
+
+        [data-theme="dark"] .custom-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animations */
+        @@keyframes slideInDown {
+            from
+
+        {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        }
+
+        @@keyframes fadeOutUp {
+            from
+
+        {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        to {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        }
+
+        .custom-alert.fade:not(.show) {
+            animation: fadeOutUp 0.5s ease-in forwards;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .alert-content
+
+        {
+            padding: 0.75rem 1rem;
+            gap: 0.75rem;
+        }
+
+        .alert-icon {
+            font-size: 1.25rem;
+        }
+
+        .alert-message strong {
+            font-size: 0.9rem;
+        }
+
+        .alert-message span {
+            font-size: 0.85rem;
+        }
+
+        .custom-close {
+            width: 28px;
+            height: 28px;
+        }
+
+        }
+
+        /* Ensure alerts are above everything */
+        .alert {
+            z-index: 1055 !important;
+            position: relative;
+        }
+
+        /* Auto-hide animation */
+        .auto-hide {
+            animation: autoHide 5s ease-in forwards;
+        }
+
+        @@keyframes autoHide {
+            0%
+
+        {
+            opacity: 1;
+        }
+
+        70% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+            transform: translateY(-100%);
+        }
+
+        }
     </style>
 </head>
 <body>
@@ -486,12 +696,13 @@
                             </button>
                         </li>
 
-                        <!-- Shopping Cart -->
-                        <li class="nav-item mx-1">
-                            <a class="nav-link position-relative" asp-controller="Cart" asp-action="Index" title="Shopping Cart">
-                                <i class="fas fa-shopping-cart"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count" id="cartCount">
-                                    0
+                        <!-- In your _Layout.cshtml navbar, make sure you have this: -->
+                        <li class="nav-item me-3">
+                            <a class="nav-link text-dark position-relative" asp-controller="Cart" asp-action="Index">
+                                <i class="fas fa-shopping-cart fa-lg"></i>
+                                <!-- This is the cart count badge - make sure it has id="cartCount" -->
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
+                                    0 <!-- This will be updated by JavaScript -->
                                 </span>
                             </a>
                         </li>
@@ -512,19 +723,73 @@
     </header>
 
     <div class="container">
-        <!-- Notification Messages -->
+        <!-- Enhanced Notification Messages -->
         @if (TempData["Success"] != null)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-success alert-dismissible fade show custom-alert" role="alert">
+                <div class="alert-content">
+                    <div class="alert-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="alert-message">
+                        <strong>Success!</strong>
+                        <span>@TempData["Success"]</span>
+                    </div>
+                    <button type="button" class="btn-close custom-close" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
         }
         @if (TempData["Error"] != null)
         {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-danger alert-dismissible fade show custom-alert" role="alert">
+                <div class="alert-content">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="alert-message">
+                        <strong>Error!</strong>
+                        <span>@TempData["Error"]</span>
+                    </div>
+                    <button type="button" class="btn-close custom-close" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        }
+        @if (TempData["Info"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show custom-alert" role="alert">
+                <div class="alert-content">
+                    <div class="alert-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="alert-message">
+                        <strong>Info</strong>
+                        <span>@TempData["Info"]</span>
+                    </div>
+                    <button type="button" class="btn-close custom-close" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        }
+        @if (TempData["Warning"] != null)
+        {
+            <div class="alert alert-warning alert-dismissible fade show custom-alert" role="alert">
+                <div class="alert-content">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="alert-message">
+                        <strong>Warning!</strong>
+                        <span>@TempData["Warning"]</span>
+                    </div>
+                    <button type="button" class="btn-close custom-close" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
         }
 
