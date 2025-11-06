@@ -36,32 +36,6 @@
             --table-hover: #f8f9fa;
         }
 
-        [data-theme="dark"] {
-            /* Modern Dark Theme */
-            --bg-primary: #0f0f0f;
-            --bg-secondary: #1a1a1a;
-            --bg-tertiary: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
-            --text-muted: #666666;
-            --border-color: #333333;
-            --border-light: #2a2a2a;
-            --accent-primary: #818cf8;
-            --accent-secondary: #a78bfa;
-            --success-color: #34d399;
-            --warning-color: #fbbf24;
-            --danger-color: #f87171;
-            --info-color: #22d3ee;
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-            --card-bg: #1a1a1a;
-            --navbar-bg: #1a1a1a;
-            --footer-bg: #0f0f0f;
-            --input-bg: #2d2d2d;
-            --table-bg: #1a1a1a;
-            --table-hover: #2d2d2d;
-        }
-
         /* Base Theme Application */
         body {
             background-color: var(--bg-primary);
@@ -212,27 +186,27 @@
         }
 
         .alert-success {
-            background-color: var(--alert-success-bg);
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
             border-left-color: var(--success-color);
-            color: var(--text-primary);
+            color: #155724;
         }
 
         .alert-danger {
-            background-color: var(--alert-danger-bg);
+            background: linear-gradient(135deg, #f8d7da 0%, #f1b0b7 100%);
             border-left-color: var(--danger-color);
-            color: var(--text-primary);
+            color: #721c24;
         }
 
         .alert-warning {
-            background-color: var(--alert-warning-bg);
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
             border-left-color: var(--warning-color);
-            color: var(--text-primary);
+            color: #856404;
         }
 
         .alert-info {
-            background-color: var(--alert-info-bg);
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
             border-left-color: var(--info-color);
-            color: var(--text-primary);
+            color: #0c5460;
         }
 
         /* Tables */
@@ -362,41 +336,32 @@
 
         /* Responsive Design */
         @@media (max-width: 992px) {
-            .navbar-search
-
-        {
-            min-width: 300px;
-            margin: 10px 0;
-        }
-
+            .navbar-search {
+                min-width: 300px;
+                margin: 10px 0;
+            }
         }
 
         @@media (max-width: 768px) {
-            .navbar-search
+            .navbar-search {
+                min-width: 250px;
+            }
 
-        {
-            min-width: 250px;
-        }
-
-        .section {
-            padding: 1rem;
-            margin: 0.5rem 0;
-        }
-
+            .section {
+                padding: 1rem;
+                margin: 0.5rem 0;
+            }
         }
 
         @@media (max-width: 576px) {
-            .navbar-search
+            .navbar-search {
+                min-width: 100%;
+                margin: 10px 0;
+            }
 
-        {
-            min-width: 100%;
-            margin: 10px 0;
-        }
-
-        .product-card {
-            padding: 1rem;
-        }
-
+            .product-card {
+                padding: 1rem;
+            }
         }
 
         /* Smooth transitions for all interactive elements */
@@ -421,6 +386,7 @@
             ::-webkit-scrollbar-thumb:hover {
                 background: var(--accent-secondary);
             }
+
         /* Enhanced Alert Styles */
         .custom-alert {
             position: relative;
@@ -432,56 +398,6 @@
             border-left: 4px solid;
             animation: slideInDown 0.5s ease-out;
             z-index: 1055; /* Above everything */
-        }
-
-            /* Light Theme (Default) */
-            .custom-alert.alert-success {
-                background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-                border-left-color: #28a745;
-                color: #155724;
-            }
-
-            .custom-alert.alert-danger {
-                background: linear-gradient(135deg, #f8d7da 0%, #f1b0b7 100%);
-                border-left-color: #dc3545;
-                color: #721c24;
-            }
-
-            .custom-alert.alert-info {
-                background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
-                border-left-color: #17a2b8;
-                color: #0c5460;
-            }
-
-            .custom-alert.alert-warning {
-                background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-                border-left-color: #ffc107;
-                color: #856404;
-            }
-
-        /* Dark Theme */
-        [data-theme="dark"] .custom-alert.alert-success {
-            background: linear-gradient(135deg, rgba(40, 167, 69, 0.2) 0%, rgba(40, 167, 69, 0.1) 100%);
-            border-left-color: #28a745;
-            color: #90ee90;
-        }
-
-        [data-theme="dark"] .custom-alert.alert-danger {
-            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(220, 53, 69, 0.1) 100%);
-            border-left-color: #dc3545;
-            color: #ff6b6b;
-        }
-
-        [data-theme="dark"] .custom-alert.alert-info {
-            background: linear-gradient(135deg, rgba(23, 162, 184, 0.2) 0%, rgba(23, 162, 184, 0.1) 100%);
-            border-left-color: #17a2b8;
-            color: #6df7ff;
-        }
-
-        [data-theme="dark"] .custom-alert.alert-warning {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 193, 7, 0.1) 100%);
-            border-left-color: #ffc107;
-            color: #ffd54f;
         }
 
         /* Alert Content Layout */
@@ -536,39 +452,29 @@
                 transform: scale(1.1);
             }
 
-        [data-theme="dark"] .custom-close:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
         /* Animations */
         @@keyframes slideInDown {
-            from
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
 
-        {
-            transform: translateY(-100%);
-            opacity: 0;
-        }
-
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         @@keyframes fadeOutUp {
-            from
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
 
-        {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        to {
-            transform: translateY(-100%);
-            opacity: 0;
-        }
-
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
         }
 
         .custom-alert.fade:not(.show) {
@@ -577,30 +483,27 @@
 
         /* Responsive Design */
         @@media (max-width: 768px) {
-            .alert-content
+            .alert-content {
+                padding: 0.75rem 1rem;
+                gap: 0.75rem;
+            }
 
-        {
-            padding: 0.75rem 1rem;
-            gap: 0.75rem;
-        }
+            .alert-icon {
+                font-size: 1.25rem;
+            }
 
-        .alert-icon {
-            font-size: 1.25rem;
-        }
+            .alert-message strong {
+                font-size: 0.9rem;
+            }
 
-        .alert-message strong {
-            font-size: 0.9rem;
-        }
+            .alert-message span {
+                font-size: 0.85rem;
+            }
 
-        .alert-message span {
-            font-size: 0.85rem;
-        }
-
-        .custom-close {
-            width: 28px;
-            height: 28px;
-        }
-
+            .custom-close {
+                width: 28px;
+                height: 28px;
+            }
         }
 
         /* Ensure alerts are above everything */
@@ -615,21 +518,18 @@
         }
 
         @@keyframes autoHide {
-            0%
+            0% {
+                opacity: 1;
+            }
 
-        {
-            opacity: 1;
-        }
+            70% {
+                opacity: 1;
+            }
 
-        70% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0;
-            transform: translateY(-100%);
-        }
-
+            100% {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
         }
     </style>
 </head>
@@ -645,7 +545,6 @@
                 <!-- Brand/Logo -->
                 <a class="navbar-brand d-none d-lg-block me-4 fw-bold" asp-area="" asp-controller="Home" asp-action="Index" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
                     <img src="https://img1.wsimg.com/isteam/ip/48686206-1376-4d8b-bb8b-665ec1c50e07/blob-1afa769.png/:/rs=w:195,h:162,cg:true,m/cr=w:195,h:162/qt=q:95" alt="Company Logo" style="height: 60px; width: auto;">
-                    @* <span style="color: var(--text-primary);">Ecomm</span> *@
                 </a>
 
                 <!-- Main Navbar Content -->
@@ -689,20 +588,12 @@
 
                     <!-- Right Navigation - User Actions -->
                     <ul class="navbar-nav ms-auto">
-                        <!-- Theme Toggle -->
-                        <li class="nav-item">
-                            <button class="btn btn-outline-secondary theme-toggle" id="themeToggle" title="Toggle theme">
-                                <i class="fas fa-moon" id="themeIcon"></i>
-                            </button>
-                        </li>
-
-                        <!-- In your _Layout.cshtml navbar, make sure you have this: -->
+                        <!-- Cart -->
                         <li class="nav-item me-3">
                             <a class="nav-link text-dark position-relative" asp-controller="Cart" asp-action="Index">
                                 <i class="fas fa-shopping-cart fa-lg"></i>
-                                <!-- This is the cart count badge - make sure it has id="cartCount" -->
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
-                                    0 <!-- This will be updated by JavaScript -->
+                                    0
                                 </span>
                             </a>
                         </li>
@@ -816,23 +707,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
-        // Enhanced Theme switching functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const themeToggle = document.getElementById('themeToggle');
-            const themeIcon = document.getElementById('themeIcon');
-            const currentTheme = localStorage.getItem('theme') || 'light';
-
-            // Apply saved theme
-            applyTheme(currentTheme);
-
-            // Theme toggle event
-            themeToggle.addEventListener('click', function() {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                applyTheme(newTheme);
-                localStorage.setItem('theme', newTheme);
-            });
-
             // Load cart count
             updateCartCount();
 
@@ -841,20 +716,6 @@
                 document.body.style.transition = 'all 0.3s ease-in-out';
             }, 100);
         });
-
-        function applyTheme(theme) {
-            const themeIcon = document.getElementById('themeIcon');
-
-            if (theme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeIcon.className = 'fas fa-sun';
-                themeIcon.title = 'Switch to light mode';
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                themeIcon.className = 'fas fa-moon';
-                themeIcon.title = 'Switch to dark mode';
-            }
-        }
 
         function updateCartCount() {
             fetch('/Cart/GetCartCount')

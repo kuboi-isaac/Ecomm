@@ -241,88 +241,11 @@
 
 @section Scripts {
     <script>
-        // Add to Cart function with AJAX
-        async function addToCart(productId, event) {
-            event.stopPropagation(); // Prevent card click
-
-            const button = event.target.closest('button');
-            const spinner = button.querySelector('.loading-spinner');
-
-            // Show loading state
-            button.disabled = true;
-            spinner.style.display = 'inline-block';
-            button.querySelector('i').style.display = 'none';
-
-            try {
-                // Get anti-forgery token
-                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-                const response = await fetch('/Cart/AddToCart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': token
-                    },
-                    body: JSON.stringify({
-                        productId: productId,
-                        quantity: 1
-                    })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // Show success message as toast notification
-                    showToast(result.message);
-
-                    // Update cart count in navbar
-                    updateCartCount(result.cartCount);
-                } else {
-                    // Show error message
-                    showToast(result.message || 'Error adding product to cart', 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Network error. Please try again.', 'error');
-            } finally {
-                // Restore button state
-                button.disabled = false;
-                spinner.style.display = 'none';
-                button.querySelector('i').style.display = 'inline-block';
-            }
-        }
-
-        // Show toast notification
-        function showToast(message, type = 'success') {
-            const toastElement = document.getElementById('cartToast');
-            const toastMessage = document.getElementById('toastMessage');
-
-            toastMessage.textContent = message;
-
-            // Set background color based on type
-            if (type === 'error') {
-                toastElement.querySelector('.toast-header').classList.add('bg-danger', 'text-blue');
-            } else {
-                toastElement.querySelector('.toast-header').classList.remove('bg-danger', 'text-blue');
-            }
-
-            const toast = new bootstrap.Toast(toastElement);
-            toast.show();
-        }
-
-        // Update cart count in navbar
-        function updateCartCount(count) {
-            const cartCountElement = document.getElementById('cartCount');
-            if (cartCountElement) {
-                cartCountElement.textContent = count;
-                cartCountElement.style.display = count > 0 ? 'block' : 'none';
-            }
-        }
-
-        // Make cards clickable
+        // Load cart count when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            const productCards = document.querySelectorAll('.product-card');
+            loadCartCount(); // Load initial cart count
 
+            const productCards = document.querySelectorAll('.product-card');
             productCards.forEach(card => {
                 card.style.cursor = 'pointer';
                 card.setAttribute('tabindex', '0');
@@ -419,12 +342,21 @@
             toast.show();
         }
 
-        // Update cart count in navbar
+        // Update cart count in navbar - FIXED VERSION
         function updateCartCount(count) {
             const cartCountElement = document.getElementById('cartCount');
             if (cartCountElement) {
                 cartCountElement.textContent = count;
-                cartCountElement.style.display = count > 0 ? 'block' : 'none';
+                // Always show, but change color when empty
+                cartCountElement.style.display = 'block';
+
+                if (count === 0) {
+                    cartCountElement.classList.add('bg-secondary');
+                    cartCountElement.classList.remove('bg-danger');
+                } else {
+                    cartCountElement.classList.add('bg-danger');
+                    cartCountElement.classList.remove('bg-secondary');
+                }
             }
         }
     </script>

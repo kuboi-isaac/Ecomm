@@ -66,25 +66,164 @@
                     <!-- Add to Cart Form -->
                     @if (Model.StockCount > 0)
                     {
-                        <form method="post" action="@Url.Action("AddToCart", "Cart")" class="mb-4">
+                        <div class="mb-4">
                             @Html.AntiForgeryToken()
-                            <input type="hidden" name="productId" value="@Model.Id">
+                            <input type="hidden" id="productId" value="@Model.Id">
 
                             <div class="row g-3 align-items-center">
                                 <div class="col-auto">
                                     <label for="quantity" class="col-form-label">Quantity:</label>
                                 </div>
                                 <div class="col-auto">
-                                    <input type="number" class="form-control" id="quantity" name="quantity"
+                                    <input type="number" class="form-control" id="quantity"
                                            value="1" min="1" max="@Model.StockCount" style="width: 100px;">
                                 </div>
                                 <div class="col-auto">
-                                    <button type="submit" class="btn btn-primary btn-lg">
+                                    <button type="button" class="btn btn-primary btn-lg" id="addToCartBtn">
                                         <i class="fas fa-shopping-cart"></i> Add to Cart
+                                        <span class="spinner-border spinner-border-sm ms-2 d-none" id="addToCartSpinner"></span>
                                     </button>
                                 </div>
                             </div>
-                        </form>
+                        </div>
+
+                        <!-- Toast Notification -->
+                        <div class="toast-container position-fixed top-0 end-0 p-3">
+                            <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                                <div class="toast-header">
+                                    <i class="fas fa-shopping-cart text-primary me-2"></i>
+                                    <strong class="me-auto">Cart</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                                <div class="toast-body" id="toastMessage">
+                                    Product added to cart!
+                                </div>
+                            </div>
+                        </div>
+
+                        @section Scripts {
+                            <script>
+                                $(document).ready(function() {
+                                    $('#addToCartBtn').click(function() {
+                                        addToCart();
+                                    });
+
+                                    // Also allow Enter key in quantity field
+                                    $('#quantity').keypress(function(e) {
+                                        if (e.which === 13) { // Enter key
+                                            addToCart();
+                                        }
+                                    });
+                                });
+
+                                async function addToCart() {
+                                    const productId = $('#productId').val();
+                                    const quantity = parseInt($('#quantity').val());
+                                    const button = $('#addToCartBtn');
+                                    const spinner = $('#addToCartSpinner');
+
+                                    // Validate quantity
+                                    if (quantity < 1 || quantity > @Model.StockCount) {
+                                        showToast('Please enter a valid quantity', 'error');
+                                        return;
+                                    }
+
+                                    // Show loading state
+                                    button.prop('disabled', true);
+                                    spinner.removeClass('d-none');
+
+                                    try {
+                                        const token = $('input[name="__RequestVerificationToken"]').val();
+
+                                        const response = await fetch('/Cart/AddToCart', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'RequestVerificationToken': token
+                                            },
+                                            body: JSON.stringify({
+                                                productId: parseInt(productId),
+                                                quantity: quantity
+                                            })
+                                        });
+
+                                        const result = await response.json();
+
+                                        if (result.success) {
+                                            showToast(result.message);
+                                            updateCartCount(result.cartCount);
+
+                                            // Optional: Show success state briefly
+                                            button.html('<i class="fas fa-check"></i> Added!');
+                                            setTimeout(() => {
+                                                button.html('<i class="fas fa-shopping-cart"></i> Add to Cart');
+                                            }, 2000);
+                                        } else {
+                                            showToast(result.message, 'error');
+                                        }
+                                    } catch (error) {
+                                        console.error('Error:', error);
+                                        showToast('Network error. Please try again.', 'error');
+                                    } finally {
+                                        // Restore button state
+                                        button.prop('disabled', false);
+                                        spinner.addClass('d-none');
+                                    }
+                                }
+
+                                function showToast(message, type = 'success') {
+                                    const toastElement = $('#cartToast');
+                                    const toastMessage = $('#toastMessage');
+
+                                    toastMessage.text(message);
+
+                                    // Set background color based on type
+                                    const toastHeader = toastElement.find('.toast-header');
+                                    if (type === 'error') {
+                                        toastHeader.addClass('bg-danger text-white');
+                                    } else {
+                                        toastHeader.removeClass('bg-danger text-white');
+                                    }
+
+                                    const toast = new bootstrap.Toast(toastElement[0]);
+                                    toast.show();
+                                }
+
+                                function updateCartCount(count) {
+                                    // Look for cart count elements in the navigation
+                                    const cartCountElements = $('.cart-count, #cartCount, [data-cart-count]');
+
+                                    if (cartCountElements.length > 0) {
+                                        cartCountElements.each(function() {
+                                            const element = $(this);
+                                            element.text(count);
+                                            element.show();
+
+                                            if (count === 0) {
+                                                element.removeClass('bg-danger').addClass('bg-secondary');
+                                            } else {
+                                                element.removeClass('bg-secondary').addClass('bg-danger');
+                                            }
+                                        });
+                                    } else {
+                                        // If no cart count element is found, create a custom event
+                                        // that the layout can listen to, or use a more generic approach
+                                        console.log('Cart count updated:', count);
+
+                                        // Alternative: Dispatch a custom event that the layout can listen to
+                                        const event = new CustomEvent('cartUpdated', {
+                                            detail: { count: count }
+                                        });
+                                        window.dispatchEvent(event);
+                                    }
+                                }
+
+                                // Listen for cart updates from other pages (optional enhancement)
+                                window.addEventListener('cartUpdated', function(event) {
+                                    updateCartCount(event.detail.count);
+                                });
+                            </script>
+                        }
                     }
                     else
                     {
