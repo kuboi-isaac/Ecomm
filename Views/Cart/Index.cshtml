@@ -131,7 +131,6 @@
         </div>
     }
 </div>
-
 @section Scripts {
     <script>
         $(document).ready(function() {
@@ -174,60 +173,166 @@
             });
 
             function updateQuantity(itemId, quantity) {
-                $.post('@Url.Action("UpdateQuantity", "Cart")', {
-                    cartItemId: itemId,
-                    quantity: quantity
-                }, function(response) {
-                    if (response.success) {
-                        // Update item total
-                        $(`.item-total[data-item-id="${itemId}"]`).text(response.itemTotal);
+                // Get anti-forgery token
+                var token = $('input[name="__RequestVerificationToken"]').val();
 
-                        // Update summary
-                        $('#subtotal').text(response.totalAmount);
-                        $('#total').text(response.totalAmount);
+                $.ajax({
+                    url: '@Url.Action("UpdateQuantity", "Cart")',
+                    type: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    data: JSON.stringify({
+                        cartItemId: itemId,
+                        quantity: quantity
+                    }),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        if (response.success) {
+                            // Update item total
+                            $(`.item-total[data-item-id="${itemId}"]`).text(response.itemTotal);
 
-                        // Update cart count in navbar
-                        updateCartCount(response.cartCount);
-                    } else {
-                        alert(response.message);
+                            // Update summary
+                            $('#subtotal').text(response.totalAmount);
+                            $('#total').text(response.totalAmount);
+
+                            // Update cart count in navbar
+                            updateCartCount(response.cartCount);
+
+                            showToast('Quantity updated successfully!');
+                        } else {
+                            showToast(response.message, 'error');
+                            location.reload(); // Reload to sync with server
+                        }
+                    },
+                    error: function() {
+                        showToast('Error updating quantity', 'error');
                         location.reload();
                     }
-                }).fail(function() {
-                    alert('Error updating quantity');
-                    location.reload();
                 });
             }
 
-                    function removeItem(itemId) {
-            $.post('@Url.Action("RemoveFromCart", "Cart")', {
-                cartItemId: itemId
-            }, function(response) {
-                if (response.success) {
-                    // Remove the item row from UI
-                    $(`[data-item-id="${itemId}"]`).closest('tr, .cart-item').fadeOut(300, function() {
-                        $(this).remove();
+            function removeItem(itemId) {
+                // Get anti-forgery token
+                var token = $('input[name="__RequestVerificationToken"]').val();
 
-                        // Update cart count in navbar
-                        updateCartCount(response.cartCount);
+                $.ajax({
+                    url: '@Url.Action("RemoveFromCart", "Cart")',
+                    type: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    data: JSON.stringify({
+                        cartItemId: itemId
+                    }),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        if (response.success) {
+                            // Remove the item row from UI with animation
+                            var itemElement = $(`[data-item-id="${itemId}"]`).closest('tr, .cart-item');
+                            itemElement.fadeOut(300, function() {
+                                $(this).remove();
 
-                        // Reload to update totals or update them via AJAX
-                        updateCartTotals();
-                    });
-                } else {
-                    alert(response.message);
-                }
-            }).fail(function() {
-                alert('Error removing item');
-            });
-        }
+                                // Update cart count in navbar
+                                updateCartCount(response.cartCount);
 
-        function updateCartTotals() {
-            // Option 1: Reload the page to get updated totals
-            location.reload();
-        }
+                                // Update totals if available in response
+                                if (response.totalAmount) {
+                                    $('#subtotal').text(response.totalAmount);
+                                    $('#total').text(response.totalAmount);
+                                } else {
+                                    // Fallback: reload if no totals in response
+                                    updateCartTotals();
+                                }
+
+                                // Check if cart is empty
+                                if ($('.cart-item').length === 0 && $('tr[data-item-id]').length === 0) {
+                                    location.reload(); // Show empty cart message
+                                }
+
+                                showToast(response.message);
+                            });
+                        } else {
+                            showToast(response.message, 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error removing item:', error);
+                        showToast('Error removing item from cart', 'error');
+                    }
+                });
+            }
+
+            function updateCartTotals() {
+                // Option 1: Reload the page to get updated totals
+                location.reload();
+
+                // Option 2: Make AJAX call to get updated totals (more advanced)
+                // updateCartSummary();
+            }
 
             function updateCartCount(count) {
-                $('#cartCount').text(count);
+                var cartCountElement = $('#cartCount');
+                cartCountElement.text(count);
+                cartCountElement.show(); // Always show the badge
+
+                // Optional: Change color based on count
+                if (count === 0) {
+                    cartCountElement.removeClass('bg-danger').addClass('bg-secondary');
+                } else {
+                    cartCountElement.removeClass('bg-secondary').addClass('bg-danger');
+                }
+            }
+
+            // Enhanced function to update cart summary via AJAX (optional)
+            function updateCartSummary() {
+                $.get('@Url.Action("GetCartSummary", "Cart")', function(response) {
+                    if (response.success) {
+                        $('#subtotal').text(response.subtotal);
+                        $('#total').text(response.total);
+                    } else {
+                        location.reload(); // Fallback to reload
+                    }
+                }).fail(function() {
+                    location.reload(); // Fallback to reload
+                });
+            }
+
+            // Show toast notification
+            function showToast(message, type = 'success') {
+                // Create toast if it doesn't exist
+                if ($('#cartToast').length === 0) {
+                    $('body').append(`
+                        <div class="toast-container position-fixed top-0 end-0 p-3">
+                            <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                                <div class="toast-header">
+                                    <i class="fas fa-shopping-cart text-primary me-2"></i>
+                                    <strong class="me-auto">Cart</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                                <div class="toast-body" id="toastMessage">
+                                    ${message}
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                }
+
+                const toastElement = $('#cartToast');
+                const toastMessage = $('#toastMessage');
+
+                toastMessage.text(message);
+
+                // Set background color based on type
+                const toastHeader = toastElement.find('.toast-header');
+                if (type === 'error') {
+                    toastHeader.addClass('bg-danger text-white');
+                } else {
+                    toastHeader.removeClass('bg-danger text-white');
+                }
+
+                const toast = new bootstrap.Toast(toastElement[0]);
+                toast.show();
             }
         });
     </script>

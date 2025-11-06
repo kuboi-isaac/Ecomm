@@ -255,7 +255,7 @@ namespace Ecomm.Controllers
             }
         }
 
-        // POST: Cart/RemoveFromCart
+        /// POST: Cart/RemoveFromCart
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> RemoveFromCart([FromBody] RemoveFromCartRequest request)
@@ -271,28 +271,32 @@ namespace Ecomm.Controllers
                     _context.CartItems.Remove(cartItem);
                     await _context.SaveChangesAsync();
 
-                    // Get updated cart count
-                    var cartCount = await _context.CartItems
+                    // Get updated cart data
+                    var cartItems = await _context.CartItems
+                        .Include(ci => ci.Product)
                         .Where(c => c.UserId == userId)
-                        .SumAsync(c => c.Quantity);
+                        .ToListAsync();
+
+                    var cartCount = cartItems.Sum(c => c.Quantity);
+                    var totalAmount = cartItems.Sum(ci => (ci.Product?.Price ?? 0) * ci.Quantity);
 
                     return Json(new
                     {
                         success = true,
-                        message = "Item removed from cart",
-                        cartCount = cartCount
+                        message = "Item removed from cart successfully!",
+                        cartCount = cartCount,
+                        totalAmount = totalAmount.ToString("C2"),
+                        itemCount = cartItems.Count
                     });
                 }
 
-                return Json(new { success = false, message = "Item not found" });
+                return Json(new { success = false, message = "Item not found in your cart" });
             }
-            catch (UnauthorizedAccessException)
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Please log in to modify cart" });
-            }
-            catch (Exception)
-            {
-                return Json(new { success = false, message = "Error removing item" });
+                // Log the actual error for debugging
+                Console.WriteLine($"Error removing cart item: {ex.Message}");
+                return Json(new { success = false, message = "Error removing item from cart. Please try again." });
             }
         }
 
