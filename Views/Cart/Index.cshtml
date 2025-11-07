@@ -24,10 +24,10 @@
                     <div class="card-header">
                         <h5 class="mb-0">Cart Items (@Model.CartItems.Sum(item => item.Quantity) items)</h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" id="cartItemsContainer">
                         @foreach (var item in Model.CartItems)
                         {
-                            <div class="row align-items-center mb-4 pb-3 border-bottom">
+                            <div class="row align-items-center mb-4 pb-3 border-bottom cart-item" data-item-id="@item.Id">
                                 <div class="col-md-2">
                                     <img src="@item.Product.ImageUrl" alt="@item.Product.Name"
                                          class="img-fluid rounded" style="max-height: 80px;">
@@ -131,6 +131,7 @@
         </div>
     }
 </div>
+
 @section Scripts {
     <script>
         $(document).ready(function() {
@@ -194,7 +195,8 @@
 
                             // Update summary
                             $('#subtotal').text(response.totalAmount);
-                            $('#total').text(response.totalAmount);
+                            $('#tax').text('$' + (response.totalAmount * 0.1).toFixed(2));
+                            $('#total').text('$' + (response.totalAmount * 1.1).toFixed(2));
 
                             // Update cart count in navbar
                             updateCartCount(response.cartCount);
@@ -228,26 +230,26 @@
                     contentType: 'application/json',
                     success: function(response) {
                         if (response.success) {
-                            // Remove the item row from UI with animation
-                            var itemElement = $(`[data-item-id="${itemId}"]`).closest('tr, .cart-item');
+                            // Remove the item row from UI - FIXED SELECTOR
+                            var itemElement = $(`.cart-item[data-item-id="${itemId}"]`);
+
                             itemElement.fadeOut(300, function() {
                                 $(this).remove();
 
                                 // Update cart count in navbar
                                 updateCartCount(response.cartCount);
 
-                                // Update totals if available in response
-                                if (response.totalAmount) {
-                                    $('#subtotal').text(response.totalAmount);
-                                    $('#total').text(response.totalAmount);
-                                } else {
-                                    // Fallback: reload if no totals in response
-                                    updateCartTotals();
-                                }
+                                // Update totals
+                                $('#subtotal').text(response.totalAmount);
+                                $('#tax').text('$' + (response.totalAmount * 0.1).toFixed(2));
+                                $('#total').text('$' + (response.totalAmount * 1.1).toFixed(2));
 
                                 // Check if cart is empty
-                                if ($('.cart-item').length === 0 && $('tr[data-item-id]').length === 0) {
-                                    location.reload(); // Show empty cart message
+                                if ($('.cart-item').length === 0) {
+                                    // Reload to show empty cart message
+                                    setTimeout(function() {
+                                        location.reload();
+                                    }, 500);
                                 }
 
                                 showToast(response.message);
@@ -263,39 +265,16 @@
                 });
             }
 
-            function updateCartTotals() {
-                // Option 1: Reload the page to get updated totals
-                location.reload();
-
-                // Option 2: Make AJAX call to get updated totals (more advanced)
-                // updateCartSummary();
-            }
-
             function updateCartCount(count) {
                 var cartCountElement = $('#cartCount');
                 cartCountElement.text(count);
-                cartCountElement.show(); // Always show the badge
 
-                // Optional: Change color based on count
                 if (count === 0) {
-                    cartCountElement.removeClass('bg-danger').addClass('bg-secondary');
+                    cartCountElement.hide();
                 } else {
+                    cartCountElement.show();
                     cartCountElement.removeClass('bg-secondary').addClass('bg-danger');
                 }
-            }
-
-            // Enhanced function to update cart summary via AJAX (optional)
-            function updateCartSummary() {
-                $.get('@Url.Action("GetCartSummary", "Cart")', function(response) {
-                    if (response.success) {
-                        $('#subtotal').text(response.subtotal);
-                        $('#total').text(response.total);
-                    } else {
-                        location.reload(); // Fallback to reload
-                    }
-                }).fail(function() {
-                    location.reload(); // Fallback to reload
-                });
             }
 
             // Show toast notification

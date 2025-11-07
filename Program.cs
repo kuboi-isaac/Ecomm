@@ -1,4 +1,4 @@
-﻿using Ecomm.Data;
+using Ecomm.Data;
 using Ecomm.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -25,6 +25,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
+
+// ✅ ADD THIS LINE: Register Razor Pages with Areas support
+builder.Services.AddRazorPages();
+
 // Add User Registration Service
 builder.Services.AddScoped<UserRegistrationService>();
 
@@ -49,11 +53,17 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// ✅ ADD THIS: Map Area routes BEFORE default routes
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
 // Routes - Use ProductsController for all product browsing
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+// ✅ ADD THIS: Map Razor Pages (this should already be there)
 app.MapRazorPages();
 
 // ✅ CHANGED: Better database initialization for PostgreSQL
