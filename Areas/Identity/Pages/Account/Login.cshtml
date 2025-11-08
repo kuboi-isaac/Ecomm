@@ -18,24 +18,11 @@
                 </div>
                 <div class="welcome-content">
                     <div class="cute-icon">
-                        <i class="fas fa-shopping-bag"></i>
+                        @* <i class="fas fa-shopping-bag"></i> *@
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFFSSwtuQmBu-4wTqaPFmClCScFMVAZTMvYw&s" alt="Shopping" class="welcome-image">
                     </div>
                     <h1 class="welcome-title">Welcome Back!</h1>
                     <p class="welcome-text">We're so excited to see you again! Let's get you logged in.</p>
-                    <div class="cute-features">
-                        <div class="feature">
-                            <i class="fas fa-star"></i>
-                            <span>Exclusive Deals</span>
-                        </div>
-                        <div class="feature">
-                            <i class="fas fa-gift"></i>
-                            <span>Personalized Offers</span>
-                        </div>
-                        <div class="feature">
-                            <i class="fas fa-bolt"></i>
-                            <span>Fast Checkout</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -53,58 +40,39 @@
                 </div>
 
                 <form id="account" method="post" class="needs-validation" novalidate>
-                    @Html.AntiForgeryToken()
-
-                    <!-- Display external login errors -->
-                    @if (Model.ExternalLogins?.Any() == true && !string.IsNullOrEmpty(Model.ErrorMessage))
-                    {
-                        <div class="alert alert-custom alert-danger" role="alert">
-                            <div class="alert-content">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>@Model.ErrorMessage</span>
-                            </div>
-                        </div>
-                    }
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
                     <!-- Email Input -->
                     <div class="form-group-custom mb-4">
-                        <label for="Input_Email" class="form-label-custom">
+                        <label asp-for="Input.Email" class="form-label-custom">
                             <i class="fas fa-envelope input-icon"></i>
                             Email Address
                         </label>
-                        <input type="email" id="Input_Email" name="Input.Email" class="form-control-custom"
-                               autocomplete="username" aria-required="true" placeholder="Enter your email"
-                               value="@Model.Input?.Email" required />
-                        <div class="invalid-feedback">
-                            Please enter a valid email address.
-                        </div>
+                        <input asp-for="Input.Email" class="form-control-custom" autocomplete="username" aria-required="true" placeholder="Enter your email" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
 
                     <!-- Password Input -->
                     <div class="form-group-custom mb-4">
-                        <label for="Input_Password" class="form-label-custom">
+                        <label asp-for="Input.Password" class="form-label-custom">
                             <i class="fas fa-lock input-icon"></i>
                             Password
                         </label>
                         <div class="password-container">
-                            <input type="password" id="Input_Password" name="Input.Password"
-                                   class="form-control-custom" autocomplete="current-password"
-                                   aria-required="true" placeholder="Enter your password" required />
+                            <input asp-for="Input.Password" class="form-control-custom" autocomplete="current-password" aria-required="true" placeholder="Enter your password" />
                             <button type="button" class="password-toggle" id="passwordToggle">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
-                        <div class="invalid-feedback">
-                            Please enter your password.
-                        </div>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
 
                     <!-- Remember Me & Forgot Password -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="form-check remember-me">
-                            <input class="form-check-input" type="checkbox" id="Input_RememberMe" name="Input.RememberMe" />
-                            <label class="form-check-label" for="Input_RememberMe">
-                                Remember me
+                            <input asp-for="Input.RememberMe" class="form-check-input" />
+                            <label asp-for="Input.RememberMe" class="form-check-label">
+                                @Html.DisplayNameFor(m => m.Input.RememberMe)
                             </label>
                         </div>
                         <a id="forgot-password" asp-page="./ForgotPassword" class="forgot-password-link">
@@ -125,33 +93,11 @@
                         </div>
                     </button>
 
-                    <!-- Divider -->
-                    <div class="divider mb-4">
-                        <span>or continue with</span>
-                    </div>
-
-                    <!-- External Logins -->
-                    @if (Model.ExternalLogins?.Any() == true)
-                    {
-                        <div class="external-logins text-center">
-                            @foreach (var provider in Model.ExternalLogins)
-                            {
-                                <button type="submit" asp-page-handler="ExternalLogin"
-                                        name="provider" value="@provider.Name"
-                                        title="Log in using your @provider.DisplayName account"
-                                        class="btn btn-external-login mb-2">
-                                    <i class="fab fa-@provider.Name.ToLower() me-2"></i>
-                                    Continue with @provider.DisplayName
-                                </button>
-                            }
-                        </div>
-                    }
-
                     <!-- Register Link -->
                     <div class="text-center mt-4">
                         <p class="register-text">
                             Don't have an account?
-                            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="register-link">
+                            <a asp-page="./Register" class="register-link">
                                 Create one here
                             </a>
                         </p>
@@ -161,6 +107,38 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            // Password toggle functionality
+            $('#passwordToggle').click(function() {
+                const passwordInput = $('#Input_Password');
+                const icon = $(this).find('i');
+
+                if (passwordInput.attr('type') === 'password') {
+                    passwordInput.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passwordInput.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            // Form submission loading state
+            $('form').submit(function() {
+                const submitBtn = $('#login-submit');
+                const btnContent = submitBtn.find('.btn-content');
+                const btnLoader = submitBtn.find('.btn-loader');
+
+                btnContent.addClass('d-none');
+                btnLoader.removeClass('d-none');
+                submitBtn.prop('disabled', true);
+            });
+        });
+    </script>
+}
 
 <style>
     /* Custom Styles for Cute Login Page */
@@ -349,10 +327,6 @@
             outline: none;
         }
 
-        .form-control-custom:invalid {
-            border-color: #e53e3e;
-        }
-
     .password-container {
         position: relative;
     }
@@ -423,44 +397,6 @@
         transform: translate(-50%, -50%);
     }
 
-    .divider {
-        position: relative;
-        text-align: center;
-        color: #a0aec0;
-    }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #e2e8f0;
-        }
-
-        .divider span {
-            background: white;
-            padding: 0 1rem;
-            position: relative;
-        }
-
-    .btn-external-login {
-        width: 100%;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 0.75rem 1.5rem;
-        background: white;
-        color: #4a5568;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
-        .btn-external-login:hover {
-            border-color: #667eea;
-            background: #f7fafc;
-        }
-
     .register-text {
         color: #718096;
     }
@@ -476,24 +412,6 @@
             color: #5a67d8;
             text-decoration: underline;
         }
-
-    .alert-custom {
-        border-radius: 12px;
-        border: none;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .alert-danger {
-        background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
-        color: #c53030;
-    }
-
-    .alert-content {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
 
     /* Mobile Responsive */
     @@media (max-width: 991.98px) {
@@ -514,55 +432,3 @@
             }
     }
 </style>
-
-@section Scripts {
-    <script>
-        $(document).ready(function() {
-            // Password toggle functionality
-            $('#passwordToggle').click(function() {
-                const passwordInput = $('#Input_Password');
-                const icon = $(this).find('i');
-
-                if (passwordInput.attr('type') === 'password') {
-                    passwordInput.attr('type', 'text');
-                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
-                } else {
-                    passwordInput.attr('type', 'password');
-                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
-                }
-            });
-
-            // Form submission loading state
-            $('form').submit(function() {
-                const submitBtn = $('#login-submit');
-                const btnContent = submitBtn.find('.btn-content');
-                const btnLoader = submitBtn.find('.btn-loader');
-
-                btnContent.addClass('d-none');
-                btnLoader.removeClass('d-none');
-                submitBtn.prop('disabled', true);
-            });
-
-            // Form validation
-            const forms = document.querySelectorAll('.needs-validation');
-            Array.from(forms).forEach(form => {
-                form.addEventListener('submit', event => {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-
-            // Add floating animation to form inputs on focus
-            $('.form-control-custom').focus(function() {
-                $(this).parent().addClass('focused');
-            }).blur(function() {
-                if ($(this).val() === '') {
-                    $(this).parent().removeClass('focused');
-                }
-            });
-        });
-    </script>
-}

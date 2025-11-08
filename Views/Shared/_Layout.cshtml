@@ -590,7 +590,7 @@
                     <ul class="navbar-nav ms-auto">
                         <!-- Cart -->
                         <li class="nav-item me-3">
-                            <a class="nav-link text-dark position-relative" asp-controller="Cart" asp-action="Index">
+                            <a class="nav-link text-dark position-relative" asp-controller="Cart" asp-action="Index" title="Cart">
                                 <i class="fas fa-shopping-cart fa-lg"></i>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
                                     0
@@ -600,8 +600,8 @@
 
                         <!-- User Menu -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" title="Account">
-                                <i class="fas fa-user-circle me-1"></i>Account
+                            <a class="nav-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" title="Account">
+                                <i class="fas fa-user-circle me-1" style="font-size: 1.3rem;"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <partial name="_LoginPartial" />

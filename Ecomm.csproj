@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="bootstrap" Version="5.3.8" />
-    <PackageReference Include="LhsBracketParser" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.19" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.10" />
