@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Ecomm.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser> // Changed this line
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -20,9 +20,9 @@ namespace Ecomm.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); // This is important for Identity
+            base.OnModelCreating(modelBuilder); //important for Identity
 
-            // Configure relationships
+            //relationships configurations
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Category)
                 .WithMany(c => c.Products)
@@ -47,7 +47,7 @@ namespace Ecomm.Data
                 .HasForeignKey(oi => oi.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Seed sample data
+            
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Electronics" },
                 new Category { Id = 2, Name = "Clothing" },
@@ -83,7 +83,7 @@ namespace Ecomm.Data
                     Name = "Cotton T-Shirt",
                     Description = "Comfortable cotton t-shirt in various colors",
                     Price = 19.99m,
-                    StockCount = 3, // Low stock
+                    StockCount = 3,
                     CategoryId = 2,
                     ImageUrl = "/images/products/tshirt.jpg",
                     IsOnSale = true
