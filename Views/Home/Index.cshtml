@@ -4,12 +4,83 @@
 }
 
 <style>
-    .truncate-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+    .hero-section {
+        background: linear-gradient(135deg, #4861ee 100%, #3f0ca8 200%) !important;
+        position: relative;
+        min-height: 25rem;
+        border-radius: 0.5rem;
+        width: 105%;
+        margin-top: 10px;
+        right: 25px;
     }
+
+    .carousel-enhanced {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+    .carousel-img-enhanced {
+        height: 250px;
+        object-fit: contain;
+        transition: transform 0.5s ease;
+        background: #f8f9fa;
+    }
+
+    .carousel-item:hover .carousel-img-enhanced {
+        transform: scale(1.1);
+    }
+
+    .carousel-caption-enhanced {
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .price-badge {
+        background: rgba(255,255,255,0.9);
+        color: #333;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-glow {
+        box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+        transition: all 0.3s ease;
+    }
+
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,255,255,0.4);
+        }
+
+    .enhanced-control {
+        width: 40px;
+        height: 40px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0 10px;
+    }
+
+    .product-card, .category-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+        .product-card:hover, .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
 
     .truncate-3 {
         display: -webkit-box;
@@ -18,142 +89,133 @@
         overflow: hidden;
     }
 
-    .product-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        cursor: pointer;
-    }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-    .category-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-    .hero-section {
-        background: linear-gradient(135deg, #000000 0%, #1E90FF 100%);
-    }
-
-    /* Card Version Styles */
-    .feature-card {
-        background-color: var(--card-bg);
-        transition: all 0.3s ease;
-        box-shadow: var(--shadow);
-    }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--accent-primary);
-        }
-
-            .feature-card:hover i {
-                transform: scale(1.1);
-                transition: transform 0.3s ease;
-            }
-
-    /* Consistent font sizes */
-    .card-title {
-        font-size: 13px;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-
-    .card-text {
-        font-size: 12px;
-        line-height: 1.3;
-    }
-
-    .price-text {
-        font-size: 14px;
-        font-weight: bold;
+    .btn-sm-custom {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
     }
 
     .card-badge {
-        font-size: 11px;
+        font-size: 0.75rem;
     }
 
-    .category-text {
-        font-size: 11px;
+    .feature-card {
+        transition: all 0.3s ease;
+        background: #f8f9fa;
     }
 
-    .btn-sm-custom {
-        font-size: 12px;
-        padding: 0.4rem 0.8rem;
-    }
-
-    .stock-text {
-        font-size: 11px;
-    }
-
-    .clickable-card {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-    }
-
-        .clickable-card:hover {
-            color: inherit;
-            text-decoration: none;
+        .feature-card:hover {
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+
+    /* Grid fixes */
+    .row {
+        margin-right: -10px;
+        margin-left: -10px;
+    }
+
+    .col {
+        padding: 10px;
+    }
+
+    /* Responsive fixes */
+    @@media (max-width: 768px) {
+        .hero-section {
+            min-height: auto;
+            padding: 2rem 0;
+        }
+
+        .display-4 {
+            font-size: 2rem;
+        }
+
+        .carousel-img-enhanced {
+            height: 200px;
+        }
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        color: royalblue;
+        background-color: black
+    }
 </style>
 
 <!-- Hero Section -->
-<section class="hero-section bg-primary text-white py-3 mb-5">
-    <div class="container rounded-3">
-        <div class="row align-items-center">
+<section class="hero-section py-4 mb-5">
+    <div class="container">
+        <div class="row align-items-center text-light">
             <div class="col-lg-6">
-                <h1 class="display-4 fw-bold">Welcome to Our E-Commerce Store</h1>
-                <p class="lead">Discover amazing products at great prices. Shop with confidence and enjoy fast delivery.</p>
-                <a href="@Url.Action("Index", "Products")" class="btn btn-light btn-lg mt-3">Shop Now</a>
+                <h1 class="display-4 fw-bold mb-4">Welcome to Our E-Commerce Store</h1>
+                <p class="lead mb-2 fw-normal display-10 text-light">Discover amazing products at great prices. Shop with confidence and enjoy fast delivery.</p>
+                <a href="@Url.Action("Index", "Products")" class="btn btn-light btn-lg btn-glow mt-2">
+                    <i class="bi bi-bag"></i>Shop Now
+                </a>
+
+                <!-- Trust indicators -->
+                <div class="row mt-4 text-center">
+                    <div class="col-4">
+                        <h4 class="fw-bold">10K+</h4>
+                        <small>Products</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="fw-bold">24/7</h4>
+                        <small>Support</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="fw-bold">99%</h4>
+                        <small>Happy Clients</small>
+                    </div>
+                </div>
             </div>
             <div class="col-lg-6">
-                <!-- Simple Product Image Carousel -->
-                <div id="productImageCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <div class="carousel-inner rounded-3 shadow-lg">
+                <!-- Enhanced Product Image Carousel -->
+                <div id="productImageCarousel" class="carousel slide carousel-enhanced" data-bs-ride="carousel">
+                    <div class="carousel-inner rounded-4 shadow-lg">
                         @if (Model.FeaturedProducts.Any())
                         {
                             @for (int i = 0; i < Model.FeaturedProducts.Count && i < 5; i++)
                             {
                                 var product = Model.FeaturedProducts[i];
-                                var imageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : $"https://picsum.photos/500/400?random={product.Id}";
+                                var imageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : $"https://picsum.photos/600/400?random={product.Id}";
 
                                 <div class="carousel-item @(i == 0 ? "active" : "") position-relative">
-                                    <img src="@imageUrl" class="d-block w-100 rounded-3" alt="@product.Name"
-                                         style="height: 300px; object-fit: cover;"
-                                         onerror="this.src='https://via.placeholder.com/500x400/007bff/ffffff?text=Product+Image'">
-                                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
-                                        <h5>@product.Name</h5>
-                                        <p class="mb-1">@product.Price.ToString("C2")</p>
+                                    <!-- Featured Badge -->
+                                    <span class="position-absolute top-0 end-0 m-3 badge bg-warning text-dark">
+                                        @(i == 0 ? "Featured" : i == 1 ? "Best Seller" : "New")
+                                    </span>
+
+                                    <img src="@imageUrl" class="d-block w-100 carousel-img-enhanced" alt="@product.Name"
+                                         onerror="this.src='https://via.placeholder.com/600x400/007bff/ffffff?text=Product+Image'">
+                                    <div class="carousel-caption-enhanced">
+                                        <div class="price-badge">@product.Price.ToString("C2")</div>
+                                        <h5 class="fw-bold mb-1">@product.Name</h5>
+                                        <p class="mb-2" style="font-size: 0.9rem;">Limited time offer</p>
                                         <a href="@Url.Action("Details", "Products", new { id = product.Id })"
-                                           class="btn btn-primary btn-sm">View</a>
+                                           class="btn btn-primary btn-sm">View Details</a>
                                     </div>
                                 </div>
                             }
                         }
                         else
                         {
-                            <div class="carousel-item active">
-                                <img src="https://www.atamgo.com/wp-content/uploads/2023/07/Ecommerce-Store.jpg"
-                                     class="d-block w-100 rounded-3" alt="Ecommerce Store"
-                                     style="height: 400px; object-fit: cover;">
+                            <div class="carousel-item active position-relative">
+                                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                                     class="d-block w-100 carousel-img-enhanced" alt="Ecommerce Store">
+                                <div class="carousel-caption-enhanced">
+                                    <h5 class="fw-bold mb-1">Discover Amazing Products</h5>
+                                    <p class="mb-0" style="font-size: 0.9rem;">Start shopping today!</p>
+                                </div>
                             </div>
                         }
                     </div>
 
-                    <!-- Controls -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
+                    <!-- Enhanced Controls -->
+                    <button class="carousel-control-prev enhanced-control" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Previous</span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
+                    <button class="carousel-control-next enhanced-control" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
@@ -167,7 +229,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize simple image carousel
         var imageCarousel = new bootstrap.Carousel(document.getElementById('productImageCarousel'), {
-            interval: 5000, // 5 seconds
+            interval: 5000,
             wrap: true
         });
     });
@@ -201,20 +263,20 @@
         <a href="@Url.Action("Index", "Products")" class="btn btn-outline-primary btn-sm-custom">View All</a>
     </div>
     <div class="row">
-        @foreach (var product in Model.FeaturedProducts)
+        @foreach (var product in Model.FeaturedProducts.Take(4))
         {
-            <div class="col">
+            <div class="col-lg-3 col-md-6 mb-4">
                 <div class="card h-100 product-card" onclick="window.location.href='@Url.Action("Details", "Products", new { id = product.Id })'">
                     @{
                         var imageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : $"https://picsum.photos/300/200?random={product.Id + 100}";
                     }
                     <img src="@imageUrl" class="card-img-top" alt="@product.Name" style="height: 180px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x180/007bff/ffffff?text=Featured+Product'">
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">@product.Name</h5>
-                        <p class="card-text text-muted flex-grow-1 truncate-3">@product.Description</p>
+                        <h5 class="card-title" style="font-size: 1rem;">@product.Name</h5>
+                        <p class="card-text text-muted flex-grow-1 truncate-3" style="font-size: 0.875rem;">@product.Description</p>
                         <div class="mt-auto">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="price-text text-primary">@product.Price.ToString("C2")</span>
+                                <span class="price-text text-primary fw-bold">@product.Price.ToString("C2")</span>
                                 @if (product.IsOnSale)
                                 {
                                     <span class="badge bg-danger card-badge">Sale</span>
@@ -240,26 +302,26 @@
 </section>
 
 <!-- New Arrivals -->
-<section class="container mb-2">
+<section class="container mb-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>New Arrivals</h2>
         <a href="@Url.Action("Index", "Products")" class="btn btn-outline-primary btn-sm-custom">View All</a>
     </div>
     <div class="row">
-        @foreach (var product in Model.NewArrivals)
+        @foreach (var product in Model.NewArrivals.Take(4))
         {
-            <div class="col-xl-4">
+            <div class="col-lg-3 col-md-6 mb-4">
                 <div class="card h-100 product-card" onclick="window.location.href='@Url.Action("Details", "Products", new { id = product.Id })'">
                     @{
                         var imageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : $"https://picsum.photos/300/200?random={product.Id + 200}";
                     }
                     <img src="@imageUrl" class="card-img-top" alt="@product.Name" style="height: 180px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x180/28a745/ffffff?text=New+Arrival'">
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">@product.Name</h5>
-                        <p class="card-text text-muted flex-grow-1 truncate-3">@product.Description</p>
+                        <h5 class="card-title" style="font-size: 1rem;">@product.Name</h5>
+                        <p class="card-text text-muted flex-grow-1 truncate-3" style="font-size: 0.875rem;">@product.Description</p>
                         <div class="mt-auto">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="price-text text-primary">@product.Price.ToString("C2")</span>
+                                <span class="price-text text-primary fw-bold">@product.Price.ToString("C2")</span>
                                 @if (product.IsOnSale)
                                 {
                                     <span class="badge bg-danger card-badge">Sale</span>
@@ -288,9 +350,9 @@
 <section class="container mb-5">
     <h2 class="mb-4">Shop by Category</h2>
     <div class="row">
-        @foreach (var category in Model.Categories)
+        @foreach (var category in Model.Categories.Take(4))
         {
-            <div class="col">
+            <div class="col-lg-3 col-md-6 mb-4">
                 <div class="card h-100 category-card" onclick="window.location.href='@Url.Action("Index", "Products", new { categoryId = category.Id })'">
                     <div class="card-body text-center d-flex flex-column">
                         <div class="mb-3">
@@ -315,7 +377,7 @@
                             <i class="@categoryIcon fa-2x @categoryColor"></i>
                         </div>
                         <h5 class="card-title">@category.Name</h5>
-                        <p class="card-text text-muted" style="font-size: 12px;">@category.Products.Count products</p>
+                        <p class="card-text text-muted" style="font-size: 0.875rem;">@category.Products.Count products</p>
                         <div class="mt-auto">
                             <a href="@Url.Action("Index", "Products", new { categoryId = category.Id })" class="btn btn-outline-primary btn-sm-custom" onclick="event.stopPropagation()">
                                 Browse Category
@@ -329,7 +391,7 @@
 </section>
 
 <!-- Special Deals - Card Version -->
-<section class="special-deals-section py-5">
+<section class="special-deals-section py-5 bg-light">
     <div class="container">
         <div class="row text-center">
             <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
@@ -339,7 +401,7 @@
                             <i class="fas fa-shipping-fast fa-2x text-primary"></i>
                         </div>
                         <h5 class="card-title">Free Shipping</h5>
-                        <p class="card-text deals-text flex-grow-1" style="font-size: 12px;">Free shipping on orders over $50</p>
+                        <p class="card-text flex-grow-1" style="font-size: 0.875rem;">Free shipping on orders over $50</p>
                     </div>
                 </div>
             </div>
@@ -350,7 +412,7 @@
                             <i class="fas fa-undo-alt fa-2x text-primary"></i>
                         </div>
                         <h5 class="card-title">Easy Returns</h5>
-                        <p class="card-text deals-text flex-grow-1" style="font-size: 12px;">30-day return policy</p>
+                        <p class="card-text flex-grow-1" style="font-size: 0.875rem;">30-day return policy</p>
                     </div>
                 </div>
             </div>
@@ -361,7 +423,7 @@
                             <i class="fas fa-lock fa-2x text-primary"></i>
                         </div>
                         <h5 class="card-title">Secure Payment</h5>
-                        <p class="card-text deals-text flex-grow-1" style="font-size: 12px;">Your payment information is safe</p>
+                        <p class="card-text flex-grow-1" style="font-size: 0.875rem;">Your payment information is safe</p>
                     </div>
                 </div>
             </div>
@@ -380,10 +442,7 @@
 
             card.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
-                    const onclickAttr = this.getAttribute('onclick');
-                    if (onclickAttr) {
-                        eval(onclickAttr);
-                    }
+                    window.location.href = this.getAttribute('onclick').match(/window\.location\.href='([^']+)'/)[1];
                 }
             });
         });

@@ -65,45 +65,84 @@
                     </div>
                 </div>
 
-                <!-- Payment Information -->
+                <!-- Mobile Money Payment Information -->
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0">Payment Information</h5>
+                        <h5 class="mb-0">Mobile Money Payment</h5>
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
-                            <label asp-for="NameOnCard" class="form-label">Name on Card *</label>
-                            <input asp-for="NameOnCard" class="form-control" required />
-                            <span asp-validation-for="NameOnCard" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="CardNumber" class="form-label">Card Number *</label>
-                            <input asp-for="CardNumber" class="form-control" placeholder="1234 5678 9012 3456" required />
-                            <span asp-validation-for="CardNumber" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="ExpiryDate" class="form-label">Expiry Date *</label>
-                                    <input asp-for="ExpiryDate" class="form-control" placeholder="MM/YY" required />
-                                    <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                        <!-- Mobile Money Provider Selection -->
+                        <div class="mb-4">
+                            <label class="form-label">Select Mobile Money Provider *</label>
+                            <div class="row">
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check card provider-card">
+                                        <input class="form-check-input" type="radio" name="MobileMoneyProvider" id="mtn" value="MTN" checked>
+                                        <label class="form-check-label w-100 p-3" for="mtn">
+                                            <div class="text-center">
+                                                <i class="fas fa-mobile-alt fa-2x text-warning mb-2"></i>
+                                                <h6 class="mb-1">MTN Mobile Money</h6>
+                                                <small class="text-muted">Pay with MTN</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check card provider-card">
+                                        <input class="form-check-input" type="radio" name="MobileMoneyProvider" id="airtel" value="Airtel">
+                                        <label class="form-check-label w-100 p-3" for="airtel">
+                                            <div class="text-center">
+                                                <i class="fas fa-sim-card fa-2x text-danger mb-2"></i>
+                                                <h6 class="mb-1">Airtel Money</h6>
+                                                <small class="text-muted">Pay with Airtel</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check card provider-card">
+                                        <input class="form-check-input" type="radio" name="MobileMoneyProvider" id="orange" value="Orange">
+                                        <label class="form-check-label w-100 p-3" for="orange">
+                                            <div class="text-center">
+                                                <i class="fas fa-phone-alt fa-2x text-orange mb-2"></i>
+                                                <h6 class="mb-1">Orange Money</h6>
+                                                <small class="text-muted">Pay with Orange</small>
+                                            </div>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="CVV" class="form-label">CVV *</label>
-                                    <input asp-for="CVV" class="form-control" placeholder="123" required />
-                                    <span asp-validation-for="CVV" class="text-danger"></span>
-                                </div>
-                            </div>
                         </div>
 
+                        <!-- Mobile Money Number -->
+                        <div class="mb-3">
+                            <label asp-for="MobileMoneyNumber" class="form-label">Mobile Money Number *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-phone"></i>
+                                </span>
+                                <input asp-for="MobileMoneyNumber" class="form-control" placeholder="e.g., 256712345678" required />
+                            </div>
+                            <span asp-validation-for="MobileMoneyNumber" class="text-danger"></span>
+                            <small class="form-text text-muted">Enter your mobile money registered phone number</small>
+                        </div>
+
+                        <!-- Payment Instructions -->
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> How to Pay:</h6>
+                            <ol class="mb-0 small">
+                                <li>Click "Place Order" to confirm your order</li>
+                                <li>You will receive a payment request on your phone</li>
+                                <li>Enter your Mobile Money PIN to complete payment</li>
+                                <li>You will receive confirmation via SMS and email</li>
+                            </ol>
+                        </div>
+
+                        <!-- Terms Agreement -->
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="saveCard" name="saveCard">
-                            <label class="form-check-label" for="saveCard">
-                                Save card for future purchases
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label small" for="agreeTerms">
+                                I agree to the <a href="#">Terms of Service</a> and authorize the charge to my Mobile Money account
                             </label>
                         </div>
                     </div>
@@ -149,13 +188,13 @@
 
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                Place Order
+                                <i class="fas fa-mobile-alt me-2"></i>Place Order
                             </button>
                         </div>
 
                         <div class="text-center mt-3">
                             <small class="text-muted">
-                                <i class="fas fa-lock"></i> Your payment information is secure and encrypted
+                                <i class="fas fa-shield-alt"></i> Secure Mobile Money Payment
                             </small>
                         </div>
                     </div>
@@ -187,29 +226,57 @@
     }
 
     <script>
-        // Format card number
-        $('#CardNumber').on('input', function() {
-            var value = $(this).val().replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-            var matches = value.match(/\d{4,16}/g);
-            var match = matches && matches[0] || '';
-            var parts = [];
-
-            for (var i = 0, len = match.length; i < len; i += 4) {
-                parts.push(match.substring(i, i + 4));
-            }
-
-            if (parts.length) {
-                $(this).val(parts.join(' '));
-            }
+        // Format phone number for mobile money
+        $('#MobileMoneyNumber').on('input', function() {
+            var value = $(this).val().replace(/\D/g, '');
+            $(this).val(value);
         });
 
-        // Format expiry date
-        $('#ExpiryDate').on('input', function() {
-            var value = $(this).val().replace(/\D/g, '');
-            if (value.length >= 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        // Provider card selection styling
+        $('.provider-card').click(function() {
+            $('.provider-card').removeClass('border-primary');
+            $(this).addClass('border-primary');
+            $(this).find('input[type="radio"]').prop('checked', true);
+        });
+
+        // Form validation for terms agreement
+        $('form').submit(function(e) {
+            if (!$('#agreeTerms').is(':checked')) {
+                e.preventDefault();
+                alert('Please agree to the terms and conditions to proceed with payment.');
+                $('#agreeTerms').focus();
             }
-            $(this).val(value);
         });
     </script>
 }
+
+<style>
+    .provider-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid #e9ecef;
+    }
+
+        .provider-card:hover {
+            border-color: #4299e1;
+            transform: translateY(-2px);
+        }
+
+        .provider-card.border-primary {
+            border-color: #4299e1 !important;
+            background-color: #f8f9ff;
+        }
+
+    .text-orange {
+        color: #ff6b35;
+    }
+
+    .form-check-input {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .provider-card .form-check-label {
+        cursor: pointer;
+    }
+</style>

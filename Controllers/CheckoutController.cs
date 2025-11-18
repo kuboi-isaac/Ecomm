@@ -195,9 +195,7 @@ namespace Ecomm.Controllers
         public string ZipCode { get; set; } = string.Empty;
 
         // Payment information
-        public string CardNumber { get; set; } = string.Empty;
-        public string ExpiryDate { get; set; } = string.Empty;
-        public string CVV { get; set; } = string.Empty;
-        public string NameOnCard { get; set; } = string.Empty;
+        public string MobileMoneyProvider { get; set; }
+        public string MobileMoneyNumber { get; set; }
     }
 }
