@@ -70,35 +70,37 @@ namespace Ecomm.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "First name is required")]
+            [Display(Name = "First Name")]
+            [StringLength(50, ErrorMessage = "First name must be between {2} and {1} characters long.", MinimumLength = 2)]
+            [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "First name can only contain letters and spaces")]
+            public string FirstName { get; set; }
+
+            [Required(ErrorMessage = "Last name is required")]
+            [Display(Name = "Last Name")]
+            [StringLength(50, ErrorMessage = "Last name must be between {2} and {1} characters long.", MinimumLength = 2)]
+            [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Last name can only contain letters and spaces")]
+            public string LastName { get; set; }
+
+            [Required(ErrorMessage = "Email is required")]
+            [EmailAddress(ErrorMessage = "Please enter a valid email address")]
             [Display(Name = "Email")]
+            [StringLength(100, ErrorMessage = "Email must be at most {1} characters long.")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
+            [Required(ErrorMessage = "Password is required")]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
+            [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{6,}$",
+                ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
         }
-
 
         public async Task OnGetAsync(string returnUrl = null)
         {
@@ -110,17 +112,42 @@ namespace Ecomm.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            // Additional email validation
+            if (!string.IsNullOrEmpty(Input.Email))
+            {
+                // Check if email domain is valid
+                if (!IsValidEmailDomain(Input.Email))
+                {
+                    ModelState.AddModelError("Input.Email", "Please enter a valid email address from a recognized domain.");
+                }
+
+                // Check if email already exists
+                var existingUser = await _userManager.FindByEmailAsync(Input.Email);
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError("Input.Email", "This email address is already registered. Please use a different email or try logging in.");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+                // FIRST create the user
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    // THEN add claims AFTER the user is created
+                    await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("FirstName", Input.FirstName));
+                    await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("LastName", Input.LastName));
+
+                    _logger.LogInformation("User created a new account with password for {FirstName} {LastName} ({Email})",
+                        Input.FirstName, Input.LastName, Input.Email);
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -131,8 +158,35 @@ namespace Ecomm.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    // Enhanced email content
+                    var emailSubject = "Confirm your Ecomm account";
+                    var emailBody = $@"
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+                    <h2 style='color: #4299e1;'>Welcome to Ecomm, {Input.FirstName}!</h2>
+                    <p>Thank you for registering with Ecomm. To complete your registration and start shopping, please confirm your email address by clicking the button below:</p>
+                    
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
+                           style='background-color: #4299e1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;'>
+                            Confirm Email Address
+                        </a>
+                    </div>
+                    
+                    <p>If the button doesn't work, you can also copy and paste this link into your browser:</p>
+                    <p style='word-break: break-all; color: #666;'>{HtmlEncoder.Default.Encode(callbackUrl)}</p>
+                    
+                    <p>This link will expire in 24 hours for security reasons.</p>
+                    
+                    <hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'>
+                    <p style='color: #666; font-size: 12px;'>
+                        If you didn't create an account with Ecomm, please ignore this email.
+                    </p>
+                </div>";
+
+                    await _emailSender.SendEmailAsync(Input.Email, emailSubject, emailBody);
+
+                    // Log email sending
+                    _logger.LogInformation("Confirmation email sent to {Email}", Input.Email);
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -175,6 +229,32 @@ namespace Ecomm.Areas.Identity.Pages.Account
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
             return (IUserEmailStore<IdentityUser>)_userStore;
+        }
+
+        /// <summary>
+        /// Validates email domain to ensure it's from a legitimate provider
+        /// </summary>
+        private bool IsValidEmailDomain(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return false;
+
+            var validDomains = new[]
+            {
+                "gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com",
+                "protonmail.com", "aol.com", "zoho.com", "yandex.com", "gmx.com",
+                "mail.com", "live.com", "msn.com"
+            };
+
+            try
+            {
+                var domain = email.Split('@').Last().ToLower();
+                return validDomains.Contains(domain);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
