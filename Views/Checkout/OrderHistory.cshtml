@@ -1,0 +1,129 @@
+﻿@model IEnumerable<Ecomm.Models.Order>
+@using Ecomm.Helpers
+@{
+    ViewData["Title"] = "Order History";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">Order History</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-bag fa-4x text-muted mb-4"></i>
+            <h3>No orders yet</h3>
+            <p class="text-muted mb-4">You haven't placed any orders yet.</p>
+            <a href="@Url.Action("Index", "Products")" class="btn btn-primary btn-lg">Start Shopping</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                @foreach (var order in Model.OrderByDescending(o => o.OrderDate))
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h5 class="mb-0">Order #@order.Id</h5>
+                                    <small class="text-muted">Placed on @order.OrderDate.ToString("MMMM dd, yyyy 'at' h:mm tt")</small>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <span class="badge
+                                                @(order.Status == "Completed" ? "bg-success" :
+                                                                                    order.Status == "Processing" ? "bg-warning" :
+                                                                                    order.Status == "Shipped" ? "bg-info" :
+                                                                                    "bg-secondary")">
+                                @order.Status
+                            </span>
+                            <div class="mt-1">
+                                <strong>@CurrencyHelper.FormatUGX(order.TotalAmount)</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6>Items:</h6>
+                            @if (order.OrderItems?.Any() == true)
+                                    {
+                                        @foreach (var item in order.OrderItems)
+                                        {
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div>
+                                                    <strong>@item.Product?.Name</strong>
+                                                    <small class="text-muted">x @item.Quantity</small>
+                                                </div>
+                                                <span>@CurrencyHelper.FormatUGX(item.Price * item.Quantity)</span>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted">No items found</p>
+                                    }
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>Shipping Info:</h6>
+                                    <p class="mb-1">
+                                        <strong>@order.FullName</strong><br>
+                                        @order.Address<br>
+                                        @order.City, @order.ZipCode<br>
+                                        @order.Phone
+                                    </p>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(order.PaymentMethod))
+                            {
+                                <div class="mt-3 pt-3 border-top">
+                                    <small class="text-muted">
+                                        <i class="fas fa-credit-card me-1"></i>
+                                        Paid via @order.PaymentMethod
+                                        @if (!string.IsNullOrEmpty(order.TransactionId))
+                                        {
+                                            <span>(Transaction: @order.TransactionId)</span>
+                                        }
+                                    </small>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        Order Total: <strong>@CurrencyHelper.FormatUGX(order.TotalAmount)</strong>
+                                    </small>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <a href="@Url.Action("OrderDetails", "Checkout", new { id = order.Id })"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                    @if (order.Status == "Completed")
+                                    {
+                                        <a href="@Url.Action("Reorder", "Checkout", new { id = order.Id })"
+                                           class="btn btn-outline-success btn-sm ms-1">
+                                            <i class="fas fa-redo me-1"></i>Reorder
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add any interactive features here
+            console.log('Order history loaded');
+        });
+    </script>
+}

@@ -22,7 +22,40 @@ namespace Ecomm.Data
         {
             base.OnModelCreating(modelBuilder); //important for Identity
 
-            //relationships configurations
+            // Configure Order entity
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.TotalAmount)
+                      .HasColumnType("decimal(18,2)");
+                entity.Property(e => e.Status)
+                      .HasDefaultValue("Processing")
+                      .HasMaxLength(50);
+                entity.Property(e => e.PaymentMethod)
+                      .HasMaxLength(100);
+                entity.Property(e => e.TransactionId)
+                      .HasMaxLength(255);
+                entity.Property(e => e.FullName)
+                      .HasMaxLength(255);
+                entity.Property(e => e.Email)
+                      .HasMaxLength(255);
+                entity.Property(e => e.Phone)
+                      .HasMaxLength(50);
+                entity.Property(e => e.City)
+                      .HasMaxLength(100);
+                entity.Property(e => e.ZipCode)
+                      .HasMaxLength(20);
+            });
+
+            // Configure OrderItem entity
+            modelBuilder.Entity<OrderItem>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Price)
+                      .HasColumnType("decimal(18,2)");
+            });
+
+            // Existing relationships configurations
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Category)
                 .WithMany(c => c.Products)
@@ -47,7 +80,7 @@ namespace Ecomm.Data
                 .HasForeignKey(oi => oi.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
+            // Existing seed data
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Electronics" },
                 new Category { Id = 2, Name = "Clothing" },

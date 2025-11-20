@@ -66,6 +66,30 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 var app = builder.Build();
 
+// ✅ Auto-create database tables (including Orders and OrderItems)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+
+        // This will create all tables that don't exist
+        context.Database.EnsureCreated();
+        Console.WriteLine("✅ All database tables created successfully!");
+
+        // Test if orders table works
+        var orderCount = context.Orders.Count();
+        Console.WriteLine($"📊 Orders table ready. Current orders: {orderCount}");
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "❌ An error occurred while creating database tables.");
+        Console.WriteLine($"❌ Database creation error: {ex.Message}");
+    }
+}
+
 // ✅ ADDED: Use localization AFTER building the app
 app.UseRequestLocalization();
 

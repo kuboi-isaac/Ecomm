@@ -1,4 +1,4 @@
-﻿@model Ecomm.Controllers.CheckoutViewModel
+﻿@model Ecomm.Models.CheckoutViewModel
 @using Ecomm.Helpers
 @{
     ViewData["Title"] = "Checkout";
@@ -157,7 +157,7 @@
                                 <span class="input-group-text">
                                     <i class="fas fa-lock"></i>
                                 </span>
-                                <input type="password" class="form-control" id="mobileMoneyPIN" placeholder="Enter your 4-digit PIN" maxlength="4" pattern="[0-9]{4}" />
+                                <input type="password" class="form-control" id="mobileMoneyPIN" placeholder="Enter your PIN" maxlength="5" pattern="[0-9]{4}" />
                             </div>
                             <small class="form-text text-muted">This is a simulation. In a real scenario, you'd receive a prompt on your phone.</small>
                         </div>
@@ -314,8 +314,8 @@
             // Show PIN input for simulation
             if ($('#pinSection').is(':visible')) {
                 // Process the form if PIN is entered
-                if ($('#mobileMoneyPIN').val().length !== 4) {
-                    alert('Please enter your 4-digit Mobile Money PIN');
+                if ($('#mobileMoneyPIN').val().length !== 5) {
+                    alert('Please enter your Mobile Money PIN');
                     $('#mobileMoneyPIN').focus();
                     return false;
                 }
@@ -365,7 +365,7 @@
         // Format PIN input
         $('#mobileMoneyPIN').on('input', function() {
             var value = $(this).val().replace(/\D/g, '');
-            $(this).val(value.substring(0, 4));
+            $(this).val(value.substring(0, 5));
         });
     </script>
 }
