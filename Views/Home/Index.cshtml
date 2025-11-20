@@ -1,4 +1,5 @@
 ﻿@model Ecomm.Controllers.HomeViewModel
+@using Ecomm.Helpers
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -188,7 +189,7 @@
                                     <img src="@imageUrl" class="d-block w-100 carousel-img-enhanced" alt="@product.Name"
                                          onerror="this.src='https://via.placeholder.com/600x400/007bff/ffffff?text=Product+Image'">
                                     <div class="carousel-caption-enhanced">
-                                        <div class="price-badge">@product.Price.ToString("C2")</div>
+                                        <div class="price-badge">@CurrencyHelper.FormatUGX(product.Price)</div> <!-- FIXED: product.Price instead of Model.Price -->
                                         <h5 class="fw-bold mb-1">@product.Name</h5>
                                         <p class="mb-2" style="font-size: 0.9rem;">Limited time offer</p>
                                         <a href="@Url.Action("Details", "Products", new { id = product.Id })"
@@ -276,7 +277,7 @@
                         <p class="card-text text-muted flex-grow-1 truncate-3" style="font-size: 0.875rem;">@product.Description</p>
                         <div class="mt-auto">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="price-text text-primary fw-bold">@product.Price.ToString("C2")</span>
+                                <span class="price-text text-primary fw-bold">@CurrencyHelper.FormatUGX(product.Price)</span> <!-- FIXED: product.Price instead of Model.Price -->
                                 @if (product.IsOnSale)
                                 {
                                     <span class="badge bg-danger card-badge">Sale</span>
@@ -321,7 +322,7 @@
                         <p class="card-text text-muted flex-grow-1 truncate-3" style="font-size: 0.875rem;">@product.Description</p>
                         <div class="mt-auto">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="price-text text-primary fw-bold">@product.Price.ToString("C2")</span>
+                                <span class="price-text text-primary fw-bold">@CurrencyHelper.FormatUGX(product.Price)</span> <!-- FIXED: product.Price instead of Model.Price -->
                                 @if (product.IsOnSale)
                                 {
                                     <span class="badge bg-danger card-badge">Sale</span>
@@ -401,7 +402,7 @@
                             <i class="fas fa-shipping-fast fa-2x text-primary"></i>
                         </div>
                         <h5 class="card-title">Free Shipping</h5>
-                        <p class="card-text flex-grow-1" style="font-size: 0.875rem;">Free shipping on orders over $50</p>
+                        <p class="card-text flex-grow-1" style="font-size: 0.875rem;">Free shipping on orders over UGX 200,000</p> <!-- Updated currency -->
                     </div>
                 </div>
             </div>

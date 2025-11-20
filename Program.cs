@@ -3,7 +3,9 @@ using Ecomm.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +27,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 
     // Lockout settings
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.MaxFailedAccessAttempts = 3;
 
     // User settings
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
@@ -50,9 +52,22 @@ builder.Services.AddSingleton<EmailSettings>(provider =>
 });
 
 // Add Email Sender Service with proper dependency injection
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+//builder.Services.AddTransient<IEmailSender, EmailSender>();
+
+// ✅ ADDED: Uganda Shillings localization
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var ugandaCulture = new CultureInfo("en-UG");
+
+    options.DefaultRequestCulture = new RequestCulture(ugandaCulture);
+    options.SupportedCultures = new List<CultureInfo> { ugandaCulture };
+    options.SupportedUICultures = new List<CultureInfo> { ugandaCulture };
+});
 
 var app = builder.Build();
+
+// ✅ ADDED: Use localization AFTER building the app
+app.UseRequestLocalization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

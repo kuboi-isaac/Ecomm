@@ -3,415 +3,549 @@
     ViewData["Title"] = "Product Details";
 }
 
-<div class="container py-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
-            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Products")">Products</a></li>
-            <li class="breadcrumb-item active">@Model.Name</li>
-        </ol>
-    </nav>
+<style>
+    /* Modern Breadcrumb */
+    .modern-breadcrumb {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 150%);
+        border-radius: 5px;
+        padding: 1rem 1rem;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        height: 50px;
+    }
 
-    <div class="row">
+    .breadcrumb {
+        margin: 0;
+        background: transparent;
+    }
+
+    .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .breadcrumb-item a:hover {
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .breadcrumb-item.active {
+        color: white;
+        font-weight: 600;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.7);
+        content: "›";
+    }
+
+    /* Product Card Styles */
+    .product-image-card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+        .product-image-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .product-image {
+        width: 100%;
+        height: 500px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .product-details-card {
+        border: none;
+        border-radius: 5px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    }
+
+    .product-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.1rem;
+    }
+
+    .category-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.6rem;
+        font-weight: 500;
+        margin-bottom: 0.1rem;
+    }
+
+    .price-section {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 0.5rem;
+        border-radius: 5px;
+        color: white;
+        margin: 1rem 0;
+        margin-bottom: 0.8rem;
+    }
+
+    .price-main {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin: 0;
+        padding: 0.5rem;
+    }
+
+    .sale-badge {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 0.5rem;
+        border-radius: 15px;
+        font-weight: 600;
+    }
+
+    .stock-badge {
+        padding: 0.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .stock-in {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+
+    .stock-low {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        color: white;
+    }
+
+    .stock-out {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: white;
+    }
+
+    .description-section {
+        background: white;
+        padding: 0.5rem;
+        border-radius: 15px;
+        border-left: 5px solid #667eea;
+        box-shadow: 10px 15px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Quantity Input */
+    .quantity-control {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0.8rem;
+        /* border-radius: 10px; */
+        color: white;
+        border-radius: 5px;
+    }
+
+    .quantity-input {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 5px;
+        color: white;
+        font-weight: 700;
+        text-align: center;
+    }
+
+        .quantity-input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: none;
+            color: white;
+        }
+
+        .quantity-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+    /* Add to Cart Button */
+    .add-to-cart-btn {
+        background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+        border-radius: 5px;
+        padding: 0.4rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 176, 155, 0.4);
+    }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 176, 155, 0.6);
+            background: linear-gradient(135deg, #009c84 100%, #85b836 100%);
+            color: white;
+        }
+
+        .add-to-cart-btn:disabled {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            transform: none;
+            box-shadow: none;
+        }
+
+    /* Admin Actions */
+    .admin-actions {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        padding: 1rem;
+        border-radius: 15px;
+        margin-top: 1rem;
+    }
+
+    .admin-btn {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 5px;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .admin-btn-edit {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+    }
+
+        .admin-btn-edit:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .admin-btn-delete {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+    }
+
+        .admin-btn-delete:hover {
+            background: #e74c3c;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    /* Toast Improvements */
+    .toast {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .product-title {
+            font-size: 2rem;
+        }
+
+        .price-main {
+            font-size: 2rem;
+        }
+
+        .modern-breadcrumb {
+            padding: 0.75rem 1rem;
+        }
+
+        .product-image {
+            height: 300px;
+        }
+    }
+</style>
+
+<div class="container">
+    <!-- Modern Breadcrumb -->
+    <div class="modern-breadcrumb">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb ">
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index", "Home")">
+                        <i class="fas fa-home me-2"></i>Home
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index", "Products")">
+                        <i class="fas fa-shopping-bag me-2"></i>Products
+                    </a>
+                </li>
+                <li class="breadcrumb-item active">
+                    <i class="fas fa-chevron-right me-2"></i>@Model.Name
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="row g-4">
         <!-- Product Image -->
-        <div class="col-lg-6 mb-4">
-            <div class="card">
+        <div class="col-lg-6">
+            <div class="product-image-card">
                 @{
-                    // Use actual ImageUrl from database, fallback to placeholder if empty
                     var imageUrl = !string.IsNullOrEmpty(Model.ImageUrl) ? Model.ImageUrl : $"https://picsum.photos/600/500?random={Model.Id}";
                 }
-                <img src="@imageUrl" class="card-img-top" alt="@Model.Name" style="max-height: 500px; object-fit: contain;" onerror="this.src='https://via.placeholder.com/600x500/007bff/ffffff?text=No+Image+Available'">
+                <img src="@imageUrl" class="product-image" alt="@Model.Name"
+                     onerror="this.src='https://via.placeholder.com/600x500/667eea/ffffff?text=No+Image+Available'">
             </div>
         </div>
 
         <!-- Product Details -->
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <h1 class="h2">@Model.Name</h1>
-                    <p class="text-muted">Category: @(Model.Category?.Name ?? "Uncategorized")</p>
+            <div class="product-details-card p-4">
+                <!-- Title and Category -->
+                <div class="d-flex justify-content-between align-items-lg-center mb-4">
+                    <h1 class="product-title">@Model.Name</h1>
+                    <span class="category-badge">
+                        <i class="fas fa-tag me-2"></i>@(Model.Category?.Name ?? "Uncategorized")
+                    </span>
+                </div>
 
-                    <div class="mb-3">
-                        <span class="h3 text-primary">@Model.Price.ToString("C2")</span>
+                <!-- Price Section -->
+                <div class="price-section">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="price-main">@Model.Price.ToString("C2")</h2>
+                            @if (Model.IsOnSale)
+                            {
+                                <p class="mb-0 opacity-75">
+                                    <i class="fas fa-tag me-2"></i>Special Offer
+                                </p>
+                            }
+                        </div>
                         @if (Model.IsOnSale)
                         {
-                            <span class="badge bg-danger ms-2">On Sale</span>
-                        }
-                    </div>
-
-                    <!-- Stock Status -->
-                    <div class="mb-4">
-                        @if (Model.StockCount > 0)
-                        {
-                            <span class="badge bg-success fs-6">
-                                @Model.StockCount in stock
+                            <span class="sale-badge">
+                                <i class="fas fa-bolt me-2"></i>ON SALE
                             </span>
-                            @if (Model.StockCount <= Model.LowStockThreshold)
-                            {
-                                <span class="badge bg-warning ms-2 fs-6">Low Stock</span>
-                            }
-                        }
-                        else
-                        {
-                            <span class="badge bg-danger fs-6">Out of Stock</span>
                         }
                     </div>
+                </div>
 
-                    <!-- Description -->
-                    <div class="mb-4">
-                        <h5>Description</h5>
-                        <p class="text-muted">@Model.Description</p>
-                    </div>
-
-                    <!-- Add to Cart Form -->
+                <!-- Stock Status -->
+                <div class="mb-4">
                     @if (Model.StockCount > 0)
                     {
-                        <div class="mb-4">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" id="productId" value="@Model.Id">
-
-                            <div class="row g-3 align-items-center">
-                                <div class="col-auto">
-                                    <label for="quantity" class="col-form-label">Quantity:</label>
-                                </div>
-                                <div class="col-auto">
-                                    <input type="number" class="form-control" id="quantity"
-                                           value="1" min="1" max="@Model.StockCount" style="width: 100px;">
-                                </div>
-                                <div class="col-auto">
-                                    <button type="button" class="btn btn-primary btn-lg" id="addToCartBtn">
-                                        <i class="fas fa-shopping-cart"></i> Add to Cart
-                                        <span class="spinner-border spinner-border-sm ms-2 d-none" id="addToCartSpinner"></span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Enhanced Toast Notification -->
-                        <div class="toast-container position-fixed top-0 end-0 p-3">
-                            <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                                <div class="toast-header">
-                                    <i class="fas fa-check-circle me-2"></i>
-                                    <strong class="me-auto">Success</strong>
-                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                </div>
-                                <div class="toast-body" id="toastMessage">
-                                    Product added to cart!
-                                </div>
-                            </div>
-                        </div>
-
-                        @section Scripts {
-                            <script>
-                                $(document).ready(function() {
-                                    $('#addToCartBtn').click(function() {
-                                        addToCart();
-                                    });
-
-                                    // Also allow Enter key in quantity field
-                                    $('#quantity').keypress(function(e) {
-                                        if (e.which === 13) { // Enter key
-                                            addToCart();
-                                        }
-                                    });
-                                });
-
-                                async function addToCart() {
-                                    const productId = $('#productId').val();
-                                    const quantity = parseInt($('#quantity').val());
-                                    const button = $('#addToCartBtn');
-                                    const spinner = $('#addToCartSpinner');
-
-                                    // Validate quantity
-                                    if (quantity < 1 || quantity > @Model.StockCount) {
-                                        showToast('Please enter a valid quantity', 'error');
-                                        return;
-                                    }
-
-                                    // Show loading state
-                                    button.prop('disabled', true);
-                                    spinner.removeClass('d-none');
-
-                                    try {
-                                        const token = $('input[name="__RequestVerificationToken"]').val();
-
-                                        const response = await fetch('/Cart/AddToCart', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'RequestVerificationToken': token
-                                            },
-                                            body: JSON.stringify({
-                                                productId: parseInt(productId),
-                                                quantity: quantity
-                                            })
-                                        });
-
-                                        // Check if response is unauthorized (401)
-                                        if (response.status === 401) {
-                                            showToast('Kindly login to Add to Cart', 'error');
-                                            // Redirect to login page after delay
-                                            setTimeout(() => {
-                                                window.location.href = '/Identity/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
-                                            }, 2000);
-                                            return;
-                                        }
-
-                                        const result = await response.json();
-
-                                        if (result.success) {
-                                            showToast(result.message);
-                                            updateCartCount(result.cartCount);
-
-                                            // Optional: Show success state briefly
-                                            button.html('<i class="fas fa-check"></i> Added!');
-                                            setTimeout(() => {
-                                                button.html('<i class="fas fa-shopping-cart"></i> Add to Cart');
-                                            }, 2000);
-                                        } else {
-                                            showToast(result.message, 'error');
-                                        }
-                                    } catch (error) {
-                                        console.error('Error:', error);
-                                        // Check if it's an authentication error
-                                        if (error.message.includes('401') || error.message.includes('unauthorized')) {
-                                            showToast('Kindly login to Add to Cart', 'error');
-                                            setTimeout(() => {
-                                                window.location.href = '/Identity/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
-                                            }, 2000);
-                                        } else {
-                                            showToast('Network error. Please try again.', 'error');
-                                        }
-                                    } finally {
-                                        // Restore button state
-                                        button.prop('disabled', false);
-                                        spinner.addClass('d-none');
-                                    }
-                                }
-
-                                function showToast(message, type = 'success') {
-                                    const toastElement = $('#cartToast');
-                                    const toastMessage = $('#toastMessage');
-
-                                    toastMessage.text(message);
-
-                                    // Remove all type classes and add the current one
-                                    toastElement.removeClass('success error warning info');
-
-                                    if (type === 'error') {
-                                        toastElement.addClass('error');
-                                        toastElement.find('.toast-header').html(`
-                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                            <strong class="me-auto">Attention Required</strong>
-                                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                        `);
-                                    } else if (type === 'warning') {
-                                        toastElement.addClass('warning');
-                                        toastElement.find('.toast-header').html(`
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            <strong class="me-auto">Warning</strong>
-                                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                        `);
-                                    } else if (type === 'info') {
-                                        toastElement.addClass('info');
-                                        toastElement.find('.toast-header').html(`
-                                            <i class="fas fa-info-circle me-2"></i>
-                                            <strong class="me-auto">Information</strong>
-                                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                        `);
-                                    } else {
-                                        toastElement.addClass('success');
-                                        toastElement.find('.toast-header').html(`
-                                            <i class="fas fa-check-circle me-2"></i>
-                                            <strong class="me-auto">Success</strong>
-                                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                        `);
-                                    }
-
-                                    const toast = new bootstrap.Toast(toastElement[0]);
-                                    toast.show();
-                                }
-
-                                function updateCartCount(count) {
-                                    // Look for cart count elements in the navigation
-                                    const cartCountElements = $('.cart-count, #cartCount, [data-cart-count]');
-
-                                    if (cartCountElements.length > 0) {
-                                        cartCountElements.each(function() {
-                                            const element = $(this);
-                                            element.text(count);
-                                            element.show();
-
-                                            if (count === 0) {
-                                                element.removeClass('bg-danger').addClass('bg-secondary');
-                                            } else {
-                                                element.removeClass('bg-secondary').addClass('bg-danger');
-                                            }
-                                        });
-                                    } else {
-                                        console.log('Cart count updated:', count);
-
-                                        // Dispatch a custom event that the layout can listen to
-                                        const event = new CustomEvent('cartUpdated', {
-                                            detail: { count: count }
-                                        });
-                                        window.dispatchEvent(event);
-                                    }
-                                }
-
-                                // Listen for cart updates from other pages
-                                window.addEventListener('cartUpdated', function(event) {
-                                    updateCartCount(event.detail.count);
-                                });
-                            </script>
+                        <span class="stock-badge stock-in">
+                            <i class="fas fa-check-circle me-2"></i>@Model.StockCount in stock
+                        </span>
+                        @if (Model.StockCount <= 10)
+                        {
+                            <span class="stock-badge stock-low ms-2">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Low Stock
+                            </span>
                         }
-
-                        <style>
-                            /* Enhanced Toast styles */
-                            .toast {
-                                background-color: var(--card-bg);
-                                border: 2px solid var(--border-color);
-                                border-radius: 12px;
-                                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-                                backdrop-filter: blur(10px);
-                                min-width: 350px;
-                            }
-
-                            .toast-header {
-                                background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-                                border-bottom: 2px solid var(--border-color);
-                                border-radius: 10px 10px 0 0;
-                                padding: 0.75rem 1rem;
-                                font-weight: 600;
-                            }
-
-                                .toast-header .btn-close {
-                                    filter: invert(1) brightness(0.8);
-                                }
-
-                            .toast-body {
-                                background-color: var(--card-bg);
-                                color: var(--text-primary);
-                                padding: 1rem 1rem;
-                                font-size: 1rem;
-                                font-weight: 500;
-                                border-radius: 0 0 10px 10px;
-                            }
-
-                            /* Success Toast */
-                            .toast.success .toast-header {
-                                background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
-                                color: white;
-                                border-bottom: 2px solid var(--success-color);
-                            }
-
-                            .toast.success .toast-body {
-                                background: rgba(16, 185, 129, 0.1);
-                                border-left: 4px solid var(--success-color);
-                            }
-
-                            /* Error Toast */
-                            .toast.error .toast-header {
-                                background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
-                                color: white;
-                                border-bottom: 2px solid var(--danger-color);
-                            }
-
-                            .toast.error .toast-body {
-                                background: rgba(239, 68, 68, 0.1);
-                                border-left: 4px solid var(--danger-color);
-                            }
-
-                            /* Warning Toast */
-                            .toast.warning .toast-header {
-                                background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);
-                                color: white;
-                                border-bottom: 2px solid var(--warning-color);
-                            }
-
-                            .toast.warning .toast-body {
-                                background: rgba(245, 158, 11, 0.1);
-                                border-left: 4px solid var(--warning-color);
-                            }
-
-                            /* Info Toast */
-                            .toast.info .toast-header {
-                                background: linear-gradient(135deg, var(--info-color) 0%, #0891b2 100%);
-                                color: white;
-                                border-bottom: 2px solid var(--info-color);
-                            }
-
-                            .toast.info .toast-body {
-                                background: rgba(6, 182, 212, 0.1);
-                                border-left: 4px solid var(--info-color);
-                            }
-
-                            /* Toast container positioning */
-                            .toast-container {
-                                z-index: 9999;
-                            }
-
-                            /* Animation for toast entrance */
-                            .toast.show {
-                                animation: toastSlideIn 0.3s ease-out;
-                            }
-
-                            @@keyframes toastSlideIn {
-                                from {
-                                    transform: translateX(100%);
-                                    opacity: 0;
-                                }
-
-                                to {
-                                    transform: translateX(0);
-                                    opacity: 1;
-                                }
-                            }
-
-                            /* Hover effects */
-                            .toast:hover {
-                                transform: translateY(-2px);
-                                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-                                transition: all 0.3s ease;
-                            }
-
-                            /* Mobile responsive */
-                            @@media (max-width: 576px) {
-                                .toast {
-                                    min-width: 300px;
-                                    margin: 0.5rem;
-                                }
-
-                                .toast-container {
-                                    padding: 0.5rem;
-                                }
-                            }
-                        </style>
                     }
                     else
                     {
-                        <button class="btn btn-secondary btn-lg" disabled>
-                            <i class="fas fa-times-circle"></i> Out of Stock
-                        </button>
-                    }
-
-                    <!-- Admin Actions -->
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <div class="mt-4 pt-3 border-top">
-                            <h6>Admin Actions</h6>
-                            <div class="btn-group">
-                                <a href="@Url.Action("Edit", "Products", new { id = Model.Id })" class="btn btn-outline-primary">
-                                    <i class="fas fa-edit"></i> Edit Product
-                                </a>
-                                <a href="@Url.Action("Delete", "Products", new { id = Model.Id })" class="btn btn-outline-danger">
-                                    <i class="fas fa-trash"></i> Delete
-                                </a>
-                            </div>
-                        </div>
+                        <span class="stock-badge stock-out">
+                            <i class="fas fa-times-circle me-2"></i>Out of Stock
+                        </span>
                     }
                 </div>
+
+                <!-- Description -->
+                <div class="description-section mb-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-align-left me-2 text-primary"></i>Description
+                    </h5>
+                    <p class="text-muted mb-0 lead">@Model.Description</p>
+                </div>
+
+                <!-- Add to Cart Form -->
+                @if (Model.StockCount > 0)
+                {
+                    <div class="quantity-control">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="productId" value="@Model.Id">
+
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-4">
+                                <label for="quantity" class="form-label h5 mb-3">
+                                    <i class="fas fa-sort-numeric-up me-2"></i>Quantity:
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" class="form-control quantity-input w-50" id="quantity"
+                                       value="1" min="1" max="@Model.StockCount">
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" class="btn add-to-cart-btn w-100" id="addToCartBtn">
+                                    <i class="fas fa-shopping-cart me-4"></i>Add to Cart
+                                    <span class="spinner-border spinner-border-sm ms-2 d-none" id="addToCartSpinner"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <button class="btn btn-secondary btn-lg w-100 py-3" disabled>
+                        <i class="fas fa-times-circle me-2"></i>Currently Unavailable
+                    </button>
+                }
+
+                <!-- Admin Actions -->
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="admin-actions">
+                        <h6 class="text-white mb-3">
+                            <i class="fas fa-cog me-2"></i>Admin Actions
+                        </h6>
+                        <div class="btn-group w-100">
+                            <a href="@Url.Action("Edit", "Products", new { id = Model.Id })"
+                               class="btn admin-btn admin-btn-edit me-2">
+                                <i class="fas fa-edit me-2"></i>Edit Product
+                            </a>
+                            <a href="@Url.Action("Delete", "Products", new { id = Model.Id })"
+                               class="btn admin-btn admin-btn-delete">
+                                <i class="fas fa-trash me-2"></i>Delete
+                            </a>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
+
+<!-- Enhanced Toast Notification -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Product added to cart!
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#addToCartBtn').click(function() {
+                addToCart();
+            });
+
+            $('#quantity').keypress(function(e) {
+                if (e.which === 13) {
+                    addToCart();
+                }
+            });
+        });
+
+        async function addToCart() {
+            const productId = $('#productId').val();
+            const quantity = parseInt($('#quantity').val());
+            const button = $('#addToCartBtn');
+            const spinner = $('#addToCartSpinner');
+
+            if (quantity < 1 || quantity > @Model.StockCount) {
+                showToast('Please enter a valid quantity', 'error');
+                return;
+            }
+
+            button.prop('disabled', true);
+            spinner.removeClass('d-none');
+
+            try {
+                const token = $('input[name="__RequestVerificationToken"]').val();
+
+                const response = await fetch('/Cart/AddToCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify({
+                        productId: parseInt(productId),
+                        quantity: quantity
+                    })
+                });
+
+                if (response.status === 401) {
+                    showToast('Please login to add items to cart', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/Identity/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    }, 2000);
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message);
+                    updateCartCount(result.cartCount);
+
+                    // Success animation
+                    button.html('<i class="fas fa-check"></i> Added to Cart!');
+                    setTimeout(() => {
+                        button.html('<i class="fas fa-shopping-cart me-2"></i>Add to Cart');
+                    }, 2000);
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (error.message.includes('401') || error.message.includes('unauthorized')) {
+                    showToast('Please login to add items to cart', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/Identity/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    }, 2000);
+                } else {
+                    showToast('Network error. Please try again.', 'error');
+                }
+            } finally {
+                button.prop('disabled', false);
+                spinner.addClass('d-none');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toastElement = $('#cartToast');
+            const toastMessage = $('#toastMessage');
+
+            toastMessage.text(message);
+
+            if (type === 'error') {
+                toastElement.find('.toast-header').removeClass('bg-success').addClass('bg-danger')
+                    .html('<i class="fas fa-exclamation-circle me-2"></i><strong class="me-auto">Error</strong><button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>');
+            } else {
+                toastElement.find('.toast-header').removeClass('bg-danger').addClass('bg-success')
+                    .html('<i class="fas fa-check-circle me-2"></i><strong class="me-auto">Success</strong><button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>');
+            }
+
+            const toast = new bootstrap.Toast(toastElement[0]);
+            toast.show();
+        }
+
+        function updateCartCount(count) {
+            const cartCountElements = $('.cart-count, #cartCount, [data-cart-count]');
+
+            if (cartCountElements.length > 0) {
+                cartCountElements.each(function() {
+                    const element = $(this);
+                    element.text(count);
+                    element.show();
+
+                    if (count === 0) {
+                        element.removeClass('bg-danger').addClass('bg-secondary');
+                    } else {
+                        element.removeClass('bg-secondary').addClass('bg-danger');
+                    }
+                });
+            }
+        }
+    </script>
+}

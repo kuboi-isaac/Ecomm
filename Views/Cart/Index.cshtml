@@ -1,4 +1,5 @@
 ﻿@model Ecomm.Controllers.CartViewModel
+@using Ecomm.Helpers
 @{
     ViewData["Title"] = "Shopping Cart";
 }
@@ -37,7 +38,7 @@
                                     <small class="text-muted">@item.Product.Category?.Name</small>
                                 </div>
                                 <div class="col-md-2">
-                                    <span class="h6">@item.Product.Price.ToString("C2")</span>
+                                    <span class="h6">@CurrencyHelper.FormatUGX(item.Product.Price)</span> <!-- FIXED -->
                                 </div>
                                 <div class="col-md-2">
                                     <div class="input-group input-group-sm">
@@ -57,7 +58,7 @@
                                 <div class="col-md-2">
                                     <div class="text-end">
                                         <span class="h6 item-total" data-item-id="@item.Id">
-                                            @((item.Product.Price * item.Quantity).ToString("C2"))
+                                            @CurrencyHelper.FormatUGX(item.Product.Price * item.Quantity) <!-- FIXED -->
                                         </span>
                                         <br>
                                         <button class="btn btn-link text-danger btn-sm remove-item"
@@ -81,7 +82,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal:</span>
-                            <span id="subtotal">@Model.TotalAmount.ToString("C2")</span>
+                            <span id="subtotal">@CurrencyHelper.FormatUGX(Model.TotalAmount)</span> <!-- FIXED -->
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Shipping:</span>
@@ -89,12 +90,12 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Tax:</span>
-                            <span id="tax">@((Model.TotalAmount * 0.1m).ToString("C2"))</span>
+                            <span id="tax">@CurrencyHelper.FormatUGX(Model.TotalAmount * 0.1m)</span> <!-- FIXED -->
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <strong>Total:</strong>
-                            <strong id="total">@((Model.TotalAmount * 1.1m).ToString("C2"))</strong>
+                            <strong id="total">@CurrencyHelper.FormatUGX(Model.TotalAmount * 1.1m)</strong> <!-- FIXED -->
                         </div>
 
                         <div class="d-grid gap-2">
@@ -190,13 +191,18 @@
                     contentType: 'application/json',
                     success: function(response) {
                         if (response.success) {
-                            // Update item total
-                            $(`.item-total[data-item-id="${itemId}"]`).text(response.itemTotal);
+                            // Update item total - FIXED: Use UGX formatting
+                            var itemTotal = 'Ushs ' + (response.itemTotal * 3800).toLocaleString();
+                            $(`.item-total[data-item-id="${itemId}"]`).text(itemTotal);
 
-                            // Update summary
-                            $('#subtotal').text(response.totalAmount);
-                            $('#tax').text('$' + (response.totalAmount * 0.1).toFixed(2));
-                            $('#total').text('$' + (response.totalAmount * 1.1).toFixed(2));
+                            // Update summary - FIXED: Use UGX formatting
+                            var subtotal = 'Ushs ' + (response.totalAmount * 3800).toLocaleString();
+                            var tax = 'Ushs ' + (response.totalAmount * 0.1 * 3800).toLocaleString();
+                            var total = 'Ushs ' + (response.totalAmount * 1.1 * 3800).toLocaleString();
+
+                            $('#subtotal').text(subtotal);
+                            $('#tax').text(tax);
+                            $('#total').text(total);
 
                             // Update cart count in navbar
                             updateCartCount(response.cartCount);
@@ -230,7 +236,7 @@
                     contentType: 'application/json',
                     success: function(response) {
                         if (response.success) {
-                            // Remove the item row from UI - FIXED SELECTOR
+                            // Remove the item row from UI
                             var itemElement = $(`.cart-item[data-item-id="${itemId}"]`);
 
                             itemElement.fadeOut(300, function() {
@@ -239,10 +245,14 @@
                                 // Update cart count in navbar
                                 updateCartCount(response.cartCount);
 
-                                // Update totals
-                                $('#subtotal').text(response.totalAmount);
-                                $('#tax').text('$' + (response.totalAmount * 0.1).toFixed(2));
-                                $('#total').text('$' + (response.totalAmount * 1.1).toFixed(2));
+                                // Update totals - FIXED: Use UGX formatting
+                                var subtotal = 'Ushs ' + (response.totalAmount * 3800).toLocaleString();
+                                var tax = 'Ushs ' + (response.totalAmount * 0.1 * 3800).toLocaleString();
+                                var total = 'Ushs ' + (response.totalAmount * 1.1 * 3800).toLocaleString();
+
+                                $('#subtotal').text(subtotal);
+                                $('#tax').text(tax);
+                                $('#total').text(total);
 
                                 // Check if cart is empty
                                 if ($('.cart-item').length === 0) {

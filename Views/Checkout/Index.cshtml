@@ -1,4 +1,5 @@
 ﻿@model Ecomm.Controllers.CheckoutViewModel
+@using Ecomm.Helpers
 @{
     ViewData["Title"] = "Checkout";
 }
@@ -6,7 +7,7 @@
 <div class="container py-4">
     <h2 class="mb-4">Checkout</h2>
 
-    <form asp-action="ProcessOrder" method="post">
+    <form asp-action="ProcessOrder" method="post" id="checkoutForm">
         @Html.AntiForgeryToken()
 
         <div class="row">
@@ -138,12 +139,27 @@
                             </ol>
                         </div>
 
-                        <!-- Terms Agreement -->
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
-                            <label class="form-check-label small" for="agreeTerms">
-                                I agree to the <a href="#">Terms of Service</a> and authorize the charge to my Mobile Money account
+                        <!-- Terms Agreement - FIXED: Added proper form field -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a> and authorize the charge of <strong>@CurrencyHelper.FormatUGX(Model.TotalAmount * 1.1m)</strong> to my Mobile Money account
                             </label>
+                            <div class="invalid-feedback">
+                                You must agree to the terms and conditions before proceeding.
+                            </div>
+                        </div>
+
+                        <!-- Mobile Money PIN (Simulated) -->
+                        <div class="mb-3" id="pinSection" style="display: none;">
+                            <label class="form-label">Enter Mobile Money PIN *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" class="form-control" id="mobileMoneyPIN" placeholder="Enter your 4-digit PIN" maxlength="4" pattern="[0-9]{4}" />
+                            </div>
+                            <small class="form-text text-muted">This is a simulation. In a real scenario, you'd receive a prompt on your phone.</small>
                         </div>
                     </div>
                 </div>
@@ -163,14 +179,14 @@
                                     <h6 class="mb-0">@item.Product.Name</h6>
                                     <small class="text-muted">Qty: @item.Quantity</small>
                                 </div>
-                                <span>@((item.Product.Price * item.Quantity).ToString("C2"))</span>
+                                <span>@CurrencyHelper.FormatUGX(item.Product.Price * item.Quantity)</span> <!-- FIXED: Currency -->
                             </div>
                         }
 
                         <hr>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal:</span>
-                            <span>@Model.TotalAmount.ToString("C2")</span>
+                            <span>@CurrencyHelper.FormatUGX(Model.TotalAmount)</span> <!-- FIXED: Currency -->
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Shipping:</span>
@@ -178,18 +194,26 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Tax:</span>
-                            <span>@((Model.TotalAmount * 0.1m).ToString("C2"))</span>
+                            <span>@CurrencyHelper.FormatUGX(Model.TotalAmount * 0.1m)</span> <!-- FIXED: Currency -->
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <strong>Total:</strong>
-                            <strong>@((Model.TotalAmount * 1.1m).ToString("C2"))</strong>
+                            <strong>@CurrencyHelper.FormatUGX(Model.TotalAmount * 1.1m)</strong> <!-- FIXED: Currency -->
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-primary btn-lg" id="placeOrderBtn">
                                 <i class="fas fa-mobile-alt me-2"></i>Place Order
                             </button>
+                        </div>
+
+                        <!-- Payment Processing Simulation -->
+                        <div class="mt-3 text-center" id="processingSection" style="display: none;">
+                            <div class="spinner-border text-primary mb-2" role="status">
+                                <span class="visually-hidden">Processing...</span>
+                            </div>
+                            <p class="small text-muted mb-0">Processing Mobile Money payment...</p>
                         </div>
 
                         <div class="text-center mt-3">
@@ -220,6 +244,42 @@
     </form>
 </div>
 
+<!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Terms of Service & Mobile Money Authorization</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Mobile Money Payment Authorization</h6>
+                <p>By proceeding with this payment, you authorize us to charge your Mobile Money account for the total amount of <strong>@CurrencyHelper.FormatUGX(Model.TotalAmount * 1.1m)</strong>.</p>
+
+                <h6>Payment Process</h6>
+                <ul>
+                    <li>You will receive a payment request on your mobile phone</li>
+                    <li>Enter your Mobile Money PIN to authorize the transaction</li>
+                    <li>The amount will be deducted from your Mobile Money balance</li>
+                    <li>You will receive an SMS confirmation from your mobile provider</li>
+                </ul>
+
+                <h6>Refund Policy</h6>
+                <p>Refunds will be processed back to your Mobile Money account within 3-5 business days.</p>
+
+                <h6>Data Privacy</h6>
+                <p>Your mobile number and payment information are securely processed and not shared with third parties.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="document.getElementById('agreeTerms').checked = true;">
+                    I Agree to Terms
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
@@ -239,13 +299,73 @@
             $(this).find('input[type="radio"]').prop('checked', true);
         });
 
-        // Form validation for terms agreement
-        $('form').submit(function(e) {
+        // Real mobile money simulation
+        $('#checkoutForm').submit(function(e) {
+            e.preventDefault();
+
+            // Check if terms are agreed
             if (!$('#agreeTerms').is(':checked')) {
-                e.preventDefault();
+                $('#agreeTerms').addClass('is-invalid');
                 alert('Please agree to the terms and conditions to proceed with payment.');
                 $('#agreeTerms').focus();
+                return false;
             }
+
+            // Show PIN input for simulation
+            if ($('#pinSection').is(':visible')) {
+                // Process the form if PIN is entered
+                if ($('#mobileMoneyPIN').val().length !== 4) {
+                    alert('Please enter your 4-digit Mobile Money PIN');
+                    $('#mobileMoneyPIN').focus();
+                    return false;
+                }
+
+                // Simulate payment processing
+                processMobileMoneyPayment();
+            } else {
+                // Show PIN section for first submission
+                $('#pinSection').slideDown();
+                $('#placeOrderBtn').html('<i class="fas fa-lock me-2"></i>Complete Payment');
+                alert('Please enter your Mobile Money PIN to complete the payment.');
+                $('#mobileMoneyPIN').focus();
+                return false;
+            }
+        });
+
+        function processMobileMoneyPayment() {
+            // Show processing animation
+            $('#placeOrderBtn').hide();
+            $('#processingSection').show();
+
+            // Simulate API call to mobile money provider
+            setTimeout(function() {
+                // Simulate successful payment
+                if (Math.random() > 0.1) { // 90% success rate for simulation
+                    // Show success message
+                    alert('✅ Payment successful! You will receive an SMS confirmation shortly.');
+
+                    // Actually submit the form
+                    document.getElementById('checkoutForm').submit();
+                } else {
+                    // Simulate failed payment
+                    alert('❌ Payment failed. Please check your Mobile Money balance and try again.');
+                    $('#placeOrderBtn').show();
+                    $('#processingSection').hide();
+                }
+            }, 3000); // Simulate 3 second processing time
+        }
+
+        // Real-time validation for terms agreement
+        $('#agreeTerms').change(function() {
+            if ($(this).is(':checked')) {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        // Format PIN input
+        $('#mobileMoneyPIN').on('input', function() {
+            var value = $(this).val().replace(/\D/g, '');
+            $(this).val(value.substring(0, 4));
         });
     </script>
 }
@@ -278,5 +398,23 @@
 
     .provider-card .form-check-label {
         cursor: pointer;
+    }
+
+    /* Terms agreement styling */
+    .form-check-input:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+
+    .invalid-feedback {
+        display: block;
+    }
+
+    /* Payment processing animation */
+    #processingSection {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.375rem;
+        border: 1px solid #dee2e6;
     }
 </style>
