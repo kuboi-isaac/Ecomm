@@ -14,6 +14,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// ✅ ADDED: Session support for guest cart functionality
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Guest cart persists for 1 day
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true; // Mark as essential for GDPR
+    options.Cookie.Name = ".Ecomm.Session";
+});
+
+
 // Identity configuration with better security settings
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
@@ -106,6 +116,11 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+
+
+// ✅ ADDED: Use session middleware (must be after UseStaticFiles and before UseRouting)
+app.UseSession();
 
 app.UseRouting();
 
