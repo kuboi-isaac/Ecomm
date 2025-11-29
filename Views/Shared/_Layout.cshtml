@@ -10,6 +10,104 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
+
+        /* Chat Bot Styles */
+        #chatBotContainer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+            font-family: Arial, sans-serif;
+        }
+
+        #chatBotToggle {
+            background: var(--accent-primary);
+            color: #fff;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s;
+        }
+
+            #chatBotToggle:hover {
+                transform: scale(1.1);
+            }
+
+        #chatBotPanel {
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            max-height: 400px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #chatBotHeader {
+            background: var(--accent-primary);
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #chatBotMessages {
+            padding: 10px;
+            height: 250px;
+            overflow-y: auto;
+            background: var(--bg-secondary);
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .chat-user {
+            background: var(--accent-secondary);
+            color: #fff;
+            align-self: flex-end;
+        }
+
+        .chat-bot {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            align-self: flex-start;
+        }
+
+        #chatBotInputArea {
+            display: flex;
+            border-top: 1px solid var(--border-color);
+        }
+
+        #chatBotInput {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            outline: none;
+        }
+
+        #chatBotSend {
+            background: var(--accent-primary);
+            border: none;
+            color: #fff;
+            padding: 0 12px;
+            cursor: pointer;
+        }
+
         :root {
             /* Modern Light Theme */
             --bg-primary: #ffffff;
@@ -585,7 +683,7 @@
                     <ul class="navbar-nav me-auto align-content-between">
                         <li class="nav-item me-4">
                             <a class="nav-link d-flex flex-column align-items-center" asp-area="" asp-controller="Home" asp-action="Index" title="Home">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-house mb-1" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi fas fa-house mb-1" viewBox="0 0 16 16">
                                     <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z" />
                                 </svg>
                                 <small class="nav-text">Home</small>
@@ -595,7 +693,7 @@
                         <!-- Products Dropdown -->
                         <li class="nav-item dropdown me-3">
                             <a class="nav-link d-flex flex-column align-items-center" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" title="Products">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bag-check mb-1" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="fas fa-box-open mb-1" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0" />
                                     <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z" />
                                 </svg>
@@ -651,7 +749,7 @@
                         <!-- User Menu -->
                         <li class="nav-item dropdown me-4">
                             <a class="nav-link d-flex flex-column align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" title="Account">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-fill-down mb-1" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-fas fa-user-circle mb-1" viewBox="0 0 16 16">
                                     <path d="M12.5 9a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7m.354 5.854 1.5-1.5a.5.5 0 0 0-.708-.708l-.646.647V10.5a.5.5 0 0 0-1 0v2.793l-.646-.647a.5.5 0 0 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
                                     <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4" />
                                 </svg>
@@ -666,6 +764,7 @@
             </div>
         </nav>
     </header>
+
 
     <div class="container">
         <!-- Enhanced Notification Messages -->
@@ -761,6 +860,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
+
         document.addEventListener('DOMContentLoaded', function() {
             // Load cart count
             updateCartCount();
@@ -811,5 +911,70 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Chat Bot -->
+    <div id="chatBotContainer">
+        <div id="chatBotToggle">
+            <i class="fas fa-comment-dots"></i>
+        </div>
+        <div id="chatBotPanel">
+            <div id="chatBotHeader">
+                <span>Chat with us!</span>
+                <i id="chatBotClose" class="fas fa-times"></i>
+            </div>
+            <div id="chatBotMessages"></div>
+            <div id="chatBotInputArea">
+                <input type="text" id="chatBotInput" placeholder="Type a message..." />
+                <button id="chatBotSend"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+                // Chat Bot Toggle
+        const chatToggle = document.getElementById('chatBotToggle');
+        const chatPanel = document.getElementById('chatBotPanel');
+        const chatClose = document.getElementById('chatBotClose');
+        const chatMessages = document.getElementById('chatBotMessages');
+        const chatInput = document.getElementById('chatBotInput');
+        const chatSend = document.getElementById('chatBotSend');
+
+        chatToggle.addEventListener('click', () => {
+            chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
+            chatPanel.style.flexDirection = 'column';
+        });
+
+        chatClose.addEventListener('click', () => {
+            chatPanel.style.display = 'none';
+        });
+
+        chatSend.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function sendMessage() {
+            const msg = chatInput.value.trim();
+            if (!msg) return;
+
+            // Display user message
+            const userMsg = document.createElement('div');
+            userMsg.classList.add('chat-message', 'chat-user');
+            userMsg.textContent = msg;
+            chatMessages.appendChild(userMsg);
+            chatInput.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Simulate bot reply (replace this with actual API call)
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.classList.add('chat-message', 'chat-bot');
+                botMsg.textContent = `You said: "${msg}"`;
+                chatMessages.appendChild(botMsg);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 800);
+        }
+
+    </script>
 </body>
 </html>

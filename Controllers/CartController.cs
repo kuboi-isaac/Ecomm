@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Ecomm.Controllers
 {
-    [Authorize]
     public class CartController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,36 +21,59 @@ namespace Ecomm.Controllers
 
         private string GetUserId()
         {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException("User not authenticated");
+            // For authenticated users, use their UserId
+            // For guest users, use session ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Create or get guest session ID
+                userId = GetOrCreateGuestSessionId();
+            }
+
+            return userId;
+        }
+
+        private string GetOrCreateGuestSessionId()
+        {
+            var sessionId = HttpContext.Session.GetString("GuestSessionId");
+
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                sessionId = $"guest_{Guid.NewGuid()}";
+                HttpContext.Session.SetString("GuestSessionId", sessionId);
+            }
+
+            return sessionId;
+        }
+
+        private bool IsGuestUser(string userId)
+        {
+            return userId.StartsWith("guest_");
         }
 
         // GET: Cart
         public async Task<IActionResult> Index()
         {
-            try
-            {
-                var userId = GetUserId();
-                var cartItems = await _context.CartItems
-                    .Where(c => c.UserId == userId)
-                    .Include(c => c.Product!)
-                    .ThenInclude(p => p!.Category)
-                    .ToListAsync();
+            var userId = GetUserId();
+            var cartItems = await _context.CartItems
+                .Where(c => c.UserId == userId)
+                .Include(c => c.Product!)
+                .ThenInclude(p => p!.Category)
+                .ToListAsync();
 
-                var viewModel = new CartViewModel
-                {
-                    CartItems = cartItems,
-                    TotalAmount = cartItems.Sum(item => item.Product?.Price * item.Quantity ?? 0)
-                };
-
-                return View(viewModel);
-            }
-            catch (UnauthorizedAccessException)
+            var viewModel = new CartViewModel
             {
-                return RedirectToPage("/Account/Login", new { area = "Identity" });
-            }
+                CartItems = cartItems,
+                TotalAmount = cartItems.Sum(item => item.Product?.Price * item.Quantity ?? 0),
+                IsGuestUser = IsGuestUser(userId)
+            };
+
+            return View(viewModel);
         }
 
         // POST: Cart/AddToCart (AJAX version)
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> AddToCart([FromBody] AddToCartRequest request)
@@ -102,7 +124,8 @@ namespace Ecomm.Controllers
                     {
                         UserId = userId,
                         ProductId = request.ProductId,
-                        Quantity = request.Quantity
+                        Quantity = request.Quantity,
+                        IsGuestCart = IsGuestUser(userId)
                     };
                     _context.CartItems.Add(cartItem);
                 }
@@ -118,21 +141,19 @@ namespace Ecomm.Controllers
                 {
                     success = true,
                     message = "Product added to cart successfully!",
-                    cartCount = cartCount
+                    cartCount = cartCount,
+                    isGuestUser = IsGuestUser(userId)
                 });
             }
-            catch (UnauthorizedAccessException)
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Please log in to add items to cart" });
-            }
-            catch (Exception)
-            {
-                // Log the exception (remove 'ex' parameter since it's not used)
+                // Log the exception
                 return Json(new { success = false, message = "Error adding product to cart" });
             }
         }
 
         // POST: Cart/AddToCartRedirect (Traditional form post)
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddToCartRedirect(int productId, int quantity = 1)
@@ -171,7 +192,8 @@ namespace Ecomm.Controllers
                     {
                         UserId = userId,
                         ProductId = productId,
-                        Quantity = quantity
+                        Quantity = quantity,
+                        IsGuestCart = IsGuestUser(userId)
                     };
                     _context.CartItems.Add(cartItem);
                 }
@@ -180,13 +202,15 @@ namespace Ecomm.Controllers
                 TempData["Success"] = "Product added to cart successfully!";
                 return RedirectToAction("Index", "Products");
             }
-            catch (UnauthorizedAccessException)
+            catch (Exception ex)
             {
-                return RedirectToPage("/Account/Login", new { area = "Identity" });
+                TempData["Error"] = "Error adding product to cart.";
+                return RedirectToAction("Index", "Products");
             }
         }
 
         // POST: Cart/UpdateQuantity
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> UpdateQuantity([FromBody] UpdateQuantityRequest request)
@@ -242,20 +266,18 @@ namespace Ecomm.Controllers
                     success = true,
                     itemTotal = itemTotal.ToString("C2"),
                     totalAmount = totalAmount.ToString("C2"),
-                    cartCount = cartCount
+                    cartCount = cartCount,
+                    isGuestUser = IsGuestUser(userId)
                 });
             }
-            catch (UnauthorizedAccessException)
-            {
-                return Json(new { success = false, message = "Please log in to update cart" });
-            }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return Json(new { success = false, message = "Error updating quantity" });
             }
         }
 
-        /// POST: Cart/RemoveFromCart
+        // POST: Cart/RemoveFromCart
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> RemoveFromCart([FromBody] RemoveFromCartRequest request)
@@ -286,7 +308,8 @@ namespace Ecomm.Controllers
                         message = "Item removed from cart successfully!",
                         cartCount = cartCount,
                         totalAmount = totalAmount.ToString("C2"),
-                        itemCount = cartItems.Count
+                        itemCount = cartItems.Count,
+                        isGuestUser = IsGuestUser(userId)
                     });
                 }
 
@@ -301,6 +324,7 @@ namespace Ecomm.Controllers
         }
 
         // GET: Cart/GetCartCount
+        [AllowAnonymous]
         [HttpGet]
         public async Task<JsonResult> GetCartCount()
         {
@@ -313,13 +337,14 @@ namespace Ecomm.Controllers
 
                 return Json(new { count = count });
             }
-            catch (UnauthorizedAccessException)
+            catch (Exception)
             {
                 return Json(new { count = 0 });
             }
         }
 
         // POST: Cart/ClearCart
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ClearCart()
@@ -344,9 +369,59 @@ namespace Ecomm.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            catch (UnauthorizedAccessException)
+            catch (Exception ex)
             {
-                return RedirectToPage("/Account/Login", new { area = "Identity" });
+                TempData["Error"] = "Error clearing cart.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        // POST: Cart/MergeGuestCart (Call this after user logs in)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MergeGuestCart(string authenticatedUserId)
+        {
+            try
+            {
+                var guestSessionId = HttpContext.Session.GetString("GuestSessionId");
+
+                if (!string.IsNullOrEmpty(guestSessionId))
+                {
+                    var guestCartItems = await _context.CartItems
+                        .Where(c => c.UserId == guestSessionId)
+                        .ToListAsync();
+
+                    foreach (var guestItem in guestCartItems)
+                    {
+                        var existingUserItem = await _context.CartItems
+                            .FirstOrDefaultAsync(c => c.UserId == authenticatedUserId && c.ProductId == guestItem.ProductId);
+
+                        if (existingUserItem != null)
+                        {
+                            // Merge quantities
+                            existingUserItem.Quantity += guestItem.Quantity;
+                            _context.CartItems.Remove(guestItem);
+                        }
+                        else
+                        {
+                            // Transfer item to user
+                            guestItem.UserId = authenticatedUserId;
+                            guestItem.IsGuestCart = false;
+                        }
+                    }
+
+                    await _context.SaveChangesAsync();
+
+                    // Clear guest session
+                    HttpContext.Session.Remove("GuestSessionId");
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't prevent user from proceeding
+                return RedirectToAction(nameof(Index));
             }
         }
     }
@@ -373,5 +448,6 @@ namespace Ecomm.Controllers
     {
         public List<CartItem> CartItems { get; set; } = new();
         public decimal TotalAmount { get; set; }
+        public bool IsGuestUser { get; set; }
     }
 }

@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Ecomm.Data;
+﻿using Ecomm.Data;
 using Ecomm.Models;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-[Authorize]
 public class CheckoutController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -15,55 +13,27 @@ public class CheckoutController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> OrderHistory()
+    public async Task<IActionResult> Index()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        var orders = await _context.Orders
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-            .Where(o => o.UserId == userId)
-            .OrderByDescending(o => o.OrderDate)
+        var cartItems = await _context.CartItems
+            .Include(ci => ci.Product)
+            .Where(ci => ci.UserId == userId)
             .ToListAsync();
 
-        return View(orders);
-    }
-
-    public async Task<IActionResult> OrderDetails(int id)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        var order = await _context.Orders
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-            .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
-
-        if (order == null)
+        if (!cartItems.Any())
         {
-            return NotFound();
+            TempData["Error"] = "Your cart is empty!";
+            return RedirectToAction("Index", "Cart");
         }
 
-        return View(order);
-    }
-
-    // Add this action for reordering
-    public async Task<IActionResult> Reorder(int id)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        var order = await _context.Orders
-            .Include(o => o.OrderItems)
-            .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
-
-        if (order == null)
+        var model = new CheckoutViewModel
         {
-            return NotFound();
-        }
+            CartItems = cartItems,
+            TotalAmount = cartItems.Sum(ci => (ci.Product?.Price ?? 0) * ci.Quantity)
+        };
 
-        // Logic to add items from this order back to cart
-        // This would depend on your cart implementation
-
-        TempData["Success"] = "Items from order have been added to your cart!";
-        return RedirectToAction("Index", "Cart");
+        return View(model);
     }
 }

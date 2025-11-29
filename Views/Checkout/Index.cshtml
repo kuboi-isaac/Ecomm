@@ -4,417 +4,157 @@
     ViewData["Title"] = "Checkout";
 }
 
-<div class="container py-4">
-    <h2 class="mb-4">Checkout</h2>
 
-    <form asp-action="ProcessOrder" method="post" id="checkoutForm">
-        @Html.AntiForgeryToken()
+<div class="checkout-container">
+    <h2 class="title">Checkout</h2>
 
-        <div class="row">
-            <!-- Customer Information -->
-            <div class="col-lg-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Customer Information</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="FullName" class="form-label">Full Name *</label>
-                                    <input asp-for="FullName" class="form-control" required />
-                                    <span asp-validation-for="FullName" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Email" class="form-label">Email *</label>
-                                    <input asp-for="Email" class="form-control" type="email" required />
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
+    <form id="checkoutForm" method="post" action="/Checkout/ProcessOrderAPI">
+        <div class="checkout-grid">
 
-                        <div class="mb-3">
-                            <label asp-for="Phone" class="form-label">Phone Number *</label>
-                            <input asp-for="Phone" class="form-control" required />
-                            <span asp-validation-for="Phone" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Address" class="form-label">Shipping Address *</label>
-                            <textarea asp-for="Address" class="form-control" rows="3" required></textarea>
-                            <span asp-validation-for="Address" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="City" class="form-label">City *</label>
-                                    <input asp-for="City" class="form-control" required />
-                                    <span asp-validation-for="City" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="ZipCode" class="form-label">ZIP Code *</label>
-                                    <input asp-for="ZipCode" class="form-control" required />
-                                    <span asp-validation-for="ZipCode" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- CUSTOMER INFO -->
+            <div class="card">
+                <h3>Customer Information</h3>
+                <div class="field-row">
+                    <input name="FullName" placeholder="Full Name" required />
+                    <input name="Email" placeholder="Email" type="email" required />
                 </div>
+                <input name="Phone" placeholder="Phone Number" required />
+                <textarea name="Address" placeholder="Shipping Address" required></textarea>
 
-                <!-- Mobile Money Payment Information -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Mobile Money Payment</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Mobile Money Provider Selection -->
-                        <div class="mb-4">
-                            <label class="form-label">Select Mobile Money Provider *</label>
-                            <div class="row">
-                                <div class="col-md-4 mb-2">
-                                    <div class="form-check card provider-card">
-                                        <input class="form-check-input" type="radio" name="MobileMoneyProvider" id="mtn" value="MTN" checked>
-                                        <label class="form-check-label w-100 p-3" for="mtn">
-                                            <div class="text-center">
-                                                <i class="fas fa-mobile-alt fa-2x text-warning mb-2"></i>
-                                                <h6 class="mb-1">MTN Mobile Money</h6>
-                                                <small class="text-muted">Pay with MTN</small>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-2">
-                                    <div class="form-check card provider-card">
-                                        <input class="form-check-input" type="radio" name="MobileMoneyProvider" id="airtel" value="Airtel">
-                                        <label class="form-check-label w-100 p-3" for="airtel">
-                                            <div class="text-center">
-                                                <i class="fas fa-sim-card fa-2x text-danger mb-2"></i>
-                                                <h6 class="mb-1">Airtel Money</h6>
-                                                <small class="text-muted">Pay with Airtel</small>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-2">
-                                    <div class="form-check card provider-card">
-                                        <input class="form-check-input" type="radio" name="MobileMoneyProvider" id="orange" value="Orange">
-                                        <label class="form-check-label w-100 p-3" for="orange">
-                                            <div class="text-center">
-                                                <i class="fas fa-phone-alt fa-2x text-orange mb-2"></i>
-                                                <h6 class="mb-1">Orange Money</h6>
-                                                <small class="text-muted">Pay with Orange</small>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Mobile Money Number -->
-                        <div class="mb-3">
-                            <label asp-for="MobileMoneyNumber" class="form-label">Mobile Money Number *</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-phone"></i>
-                                </span>
-                                <input asp-for="MobileMoneyNumber" class="form-control" placeholder="e.g., 256712345678" required />
-                            </div>
-                            <span asp-validation-for="MobileMoneyNumber" class="text-danger"></span>
-                            <small class="form-text text-muted">Enter your mobile money registered phone number</small>
-                        </div>
-
-                        <!-- Payment Instructions -->
-                        <div class="alert alert-info">
-                            <h6><i class="fas fa-info-circle"></i> How to Pay:</h6>
-                            <ol class="mb-0 small">
-                                <li>Click "Place Order" to confirm your order</li>
-                                <li>You will receive a payment request on your phone</li>
-                                <li>Enter your Mobile Money PIN to complete payment</li>
-                                <li>You will receive confirmation via SMS and email</li>
-                            </ol>
-                        </div>
-
-                        <!-- Terms Agreement - FIXED: Added proper form field -->
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="agreeTerms" name="agreeTerms" required>
-                            <label class="form-check-label" for="agreeTerms">
-                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a> and authorize the charge of <strong>@CurrencyHelper.FormatUGX(Model.TotalAmount * 1.1m)</strong> to my Mobile Money account
-                            </label>
-                            <div class="invalid-feedback">
-                                You must agree to the terms and conditions before proceeding.
-                            </div>
-                        </div>
-
-                        <!-- Mobile Money PIN (Simulated) -->
-                        <div class="mb-3" id="pinSection" style="display: none;">
-                            <label class="form-label">Enter Mobile Money PIN *</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-lock"></i>
-                                </span>
-                                <input type="password" class="form-control" id="mobileMoneyPIN" placeholder="Enter your PIN" maxlength="5" pattern="[0-9]{4}" />
-                            </div>
-                            <small class="form-text text-muted">This is a simulation. In a real scenario, you'd receive a prompt on your phone.</small>
-                        </div>
-                    </div>
+                <div class="field-row">
+                    <input name="City" placeholder="City" required />
+                    <input name="ZipCode" placeholder="ZIP Code" required />
                 </div>
             </div>
 
-            <!-- Order Summary -->
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Order Summary</h5>
-                    </div>
-                    <div class="card-body">
-                        @foreach (var item in Model.CartItems)
-                        {
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div>
-                                    <h6 class="mb-0">@item.Product.Name</h6>
-                                    <small class="text-muted">Qty: @item.Quantity</small>
-                                </div>
-                                <span>@CurrencyHelper.FormatUGX(item.Product.Price * item.Quantity)</span> <!-- FIXED: Currency -->
-                            </div>
-                        }
+            <!-- PAYMENT SECTION -->
+            <div class="card">
+                <h3>Mobile Money Payment</h3>
 
-                        <hr>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal:</span>
-                            <span>@CurrencyHelper.FormatUGX(Model.TotalAmount)</span> <!-- FIXED: Currency -->
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Shipping:</span>
-                            <span>Free</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Tax:</span>
-                            <span>@CurrencyHelper.FormatUGX(Model.TotalAmount * 0.1m)</span> <!-- FIXED: Currency -->
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between mb-3">
-                            <strong>Total:</strong>
-                            <strong>@CurrencyHelper.FormatUGX(Model.TotalAmount * 1.1m)</strong> <!-- FIXED: Currency -->
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg" id="placeOrderBtn">
-                                <i class="fas fa-mobile-alt me-2"></i>Place Order
-                            </button>
-                        </div>
-
-                        <!-- Payment Processing Simulation -->
-                        <div class="mt-3 text-center" id="processingSection" style="display: none;">
-                            <div class="spinner-border text-primary mb-2" role="status">
-                                <span class="visually-hidden">Processing...</span>
-                            </div>
-                            <p class="small text-muted mb-0">Processing Mobile Money payment...</p>
-                        </div>
-
-                        <div class="text-center mt-3">
-                            <small class="text-muted">
-                                <i class="fas fa-shield-alt"></i> Secure Mobile Money Payment
-                            </small>
-                        </div>
-                    </div>
+                <div class="providers">
+                    <label class="provider"><input type="radio" name="provider" value="MTN" checked> MTN Mobile Money</label>
+                    <label class="provider"><input type="radio" name="provider" value="Airtel"> Airtel Money</label>
                 </div>
 
-                <!-- Support Information -->
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <h6>Need Help?</h6>
-                        <p class="small mb-1">
-                            <i class="fas fa-phone"></i> 1-800-ECOMMERCE
-                        </p>
-                        <p class="small mb-1">
-                            <i class="fas fa-envelope"></i> support@ecommerce.com
-                        </p>
-                        <p class="small mb-0">
-                            <i class="fas fa-clock"></i> 24/7 Support
-                        </p>
-                    </div>
-                </div>
+                <input id="mmNumber" name="MobileMoneyNumber" placeholder="Mobile Money Number (2567...)" required />
+
+                <label class="terms-label">
+                    <input type="checkbox" id="agreeTerms" required />
+                    I agree to the payment terms and authorize charge.
+                </label>
+
+                <button type="submit" id="payBtn" class="btn-primary">Pay Now</button>
+
+                <div id="processing" class="processing hidden">Processing payment...</div>
             </div>
+
         </div>
     </form>
 </div>
 
-<!-- Terms and Conditions Modal -->
-<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="termsModalLabel">Terms of Service & Mobile Money Authorization</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <h6>Mobile Money Payment Authorization</h6>
-                <p>By proceeding with this payment, you authorize us to charge your Mobile Money account for the total amount of <strong>@CurrencyHelper.FormatUGX(Model.TotalAmount * 1.1m)</strong>.</p>
+<script>
+    // Asynchronous API Payment Submission
+    document.getElementById("checkoutForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
 
-                <h6>Payment Process</h6>
-                <ul>
-                    <li>You will receive a payment request on your mobile phone</li>
-                    <li>Enter your Mobile Money PIN to authorize the transaction</li>
-                    <li>The amount will be deducted from your Mobile Money balance</li>
-                    <li>You will receive an SMS confirmation from your mobile provider</li>
-                </ul>
+        const provider = document.querySelector("input[name='provider']:checked").value;
+        const number = document.getElementById("mmNumber").value;
 
-                <h6>Refund Policy</h6>
-                <p>Refunds will be processed back to your Mobile Money account within 3-5 business days.</p>
+        document.getElementById("payBtn").classList.add("hidden");
+        document.getElementById("processing").classList.remove("hidden");
 
-                <h6>Data Privacy</h6>
-                <p>Your mobile number and payment information are securely processed and not shared with third parties.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="document.getElementById('agreeTerms').checked = true;">
-                    I Agree to Terms
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
-    <script>
-        // Format phone number for mobile money
-        $('#MobileMoneyNumber').on('input', function() {
-            var value = $(this).val().replace(/\D/g, '');
-            $(this).val(value);
+        // CALL THE API CONTROLLER ENDPOINT
+        const response = await fetch('/Checkout/InitiateMobileMoneyPayment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: provider, number: number })
         });
 
-        // Provider card selection styling
-        $('.provider-card').click(function() {
-            $('.provider-card').removeClass('border-primary');
-            $(this).addClass('border-primary');
-            $(this).find('input[type="radio"]').prop('checked', true);
-        });
+        const result = await response.json();
 
-        // Real mobile money simulation
-        $('#checkoutForm').submit(function(e) {
-            e.preventDefault();
-
-            // Check if terms are agreed
-            if (!$('#agreeTerms').is(':checked')) {
-                $('#agreeTerms').addClass('is-invalid');
-                alert('Please agree to the terms and conditions to proceed with payment.');
-                $('#agreeTerms').focus();
-                return false;
-            }
-
-            // Show PIN input for simulation
-            if ($('#pinSection').is(':visible')) {
-                // Process the form if PIN is entered
-                if ($('#mobileMoneyPIN').val().length !== 5) {
-                    alert('Please enter your Mobile Money PIN');
-                    $('#mobileMoneyPIN').focus();
-                    return false;
-                }
-
-                // Simulate payment processing
-                processMobileMoneyPayment();
-            } else {
-                // Show PIN section for first submission
-                $('#pinSection').slideDown();
-                $('#placeOrderBtn').html('<i class="fas fa-lock me-2"></i>Complete Payment');
-                alert('Please enter your Mobile Money PIN to complete the payment.');
-                $('#mobileMoneyPIN').focus();
-                return false;
-            }
-        });
-
-        function processMobileMoneyPayment() {
-            // Show processing animation
-            $('#placeOrderBtn').hide();
-            $('#processingSection').show();
-
-            // Simulate API call to mobile money provider
-            setTimeout(function() {
-                // Simulate successful payment
-                if (Math.random() > 0.1) { // 90% success rate for simulation
-                    // Show success message
-                    alert('✅ Payment successful! You will receive an SMS confirmation shortly.');
-
-                    // Actually submit the form
-                    document.getElementById('checkoutForm').submit();
-                } else {
-                    // Simulate failed payment
-                    alert('❌ Payment failed. Please check your Mobile Money balance and try again.');
-                    $('#placeOrderBtn').show();
-                    $('#processingSection').hide();
-                }
-            }, 3000); // Simulate 3 second processing time
+        if (result.success) {
+            alert('Payment request sent. Please approve prompt on your phone.');
+            this.submit(); // Submit actual order
+        } else {
+            alert('Payment failed: ' + result.message);
+            document.getElementById("payBtn").classList.remove("hidden");
+            document.getElementById("processing").classList.add("hidden");
         }
-
-        // Real-time validation for terms agreement
-        $('#agreeTerms').change(function() {
-            if ($(this).is(':checked')) {
-                $(this).removeClass('is-invalid');
-            }
-        });
-
-        // Format PIN input
-        $('#mobileMoneyPIN').on('input', function() {
-            var value = $(this).val().replace(/\D/g, '');
-            $(this).val(value.substring(0, 5));
-        });
-    </script>
-}
+    });
+</script>
 
 <style>
-    .provider-card {
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: 2px solid #e9ecef;
+    .checkout-container {
+        max-width: 1100px;
+        margin: auto;
+        padding: 20px;
     }
 
-        .provider-card:hover {
-            border-color: #4299e1;
-            transform: translateY(-2px);
-        }
-
-        .provider-card.border-primary {
-            border-color: #4299e1 !important;
-            background-color: #f8f9ff;
-        }
-
-    .text-orange {
-        color: #ff6b35;
+    .title {
+        text-align: center;
+        font-size: 26px;
+        font-weight: bold;
+        margin-bottom: 20px;
     }
 
-    .form-check-input {
-        position: absolute;
-        opacity: 0;
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
     }
 
-    .provider-card .form-check-label {
-        cursor: pointer;
+    .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
     }
 
-    /* Terms agreement styling */
-    .form-check-input:checked {
-        background-color: #198754;
-        border-color: #198754;
+    .field-row {
+        display: flex;
+        gap: 10px;
     }
 
-    .invalid-feedback {
-        display: block;
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin-bottom: 12px;
     }
 
-    /* Payment processing animation */
-    #processingSection {
+    .providers {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .provider {
         background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 0.375rem;
-        border: 1px solid #dee2e6;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 8px;
+        flex: 1;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        width: 100%;
+        background: #007bff;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .processing {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .hidden {
+        display: none;
     }
 </style>

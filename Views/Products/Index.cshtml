@@ -16,6 +16,7 @@
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         cursor: pointer;
         position: relative;
+        padding: 10px;
     }
 
         .product-card:hover {
@@ -382,6 +383,7 @@
         }
 
         // Add to Cart function with AJAX
+                // Enhanced Add to Cart function with guest user support
         async function addToCart(productId, event) {
             event.stopPropagation(); // Prevent card click
 
@@ -417,13 +419,18 @@
 
                     // Update cart count in navbar
                     updateCartCount(result.cartCount);
+
+                    // If it's a guest user, show appropriate message
+                    if (result.isGuestUser) {
+                        console.log('Guest user cart updated');
+                    }
                 } else {
                     // Show error message
                     showToast(result.message || 'Error adding product to cart', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showToast('Kindly login to Add to Cart', 'error');
+                showToast('Network error. Please try again.', 'error');
             } finally {
                 // Restore button state
                 button.disabled = false;
@@ -433,48 +440,49 @@
         }
 
         // Show toast notification
+                // Enhanced toast notification with guest user messaging
         function showToast(message, type = 'success') {
-    const toastElement = $('#cartToast');
-    const toastMessage = $('#toastMessage');
+            const toastElement = $('#cartToast');
+            const toastMessage = $('#toastMessage');
 
-    toastMessage.text(message);
+            toastMessage.text(message);
 
-    // Remove all type classes and add the current one
-    toastElement.removeClass('success error warning info');
-    
-    if (type === 'error') {
-        toastElement.addClass('error');
-        toastElement.find('.toast-header').html(`
-            <i class="fas fa-exclamation-circle me-2"></i>
-            <strong class="me-auto">Attention Required</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        `);
-    } else if (type === 'warning') {
-        toastElement.addClass('warning');
-        toastElement.find('.toast-header').html(`
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong class="me-auto">Warning</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        `);
-    } else if (type === 'info') {
-        toastElement.addClass('info');
-        toastElement.find('.toast-header').html(`
-            <i class="fas fa-info-circle me-2"></i>
-            <strong class="me-auto">Information</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        `);
-    } else {
-        toastElement.addClass('success');
-        toastElement.find('.toast-header').html(`
-            <i class="fas fa-check-circle me-2"></i>
-            <strong class="me-auto">Success</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        `);
-    }
+            // Remove all type classes and add the current one
+            toastElement.removeClass('success error warning info');
 
-    const toast = new bootstrap.Toast(toastElement[0]);
-    toast.show();
-}
+            if (type === 'error') {
+                toastElement.addClass('error');
+                toastElement.find('.toast-header').html(`
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong class="me-auto">Attention Required</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                `);
+            } else if (type === 'warning') {
+                toastElement.addClass('warning');
+                toastElement.find('.toast-header').html(`
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong class="me-auto">Warning</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                `);
+            } else if (type === 'info') {
+                toastElement.addClass('info');
+                toastElement.find('.toast-header').html(`
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong class="me-auto">Information</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                `);
+            } else {
+                toastElement.addClass('success');
+                toastElement.find('.toast-header').html(`
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong class="me-auto">Success</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                `);
+            }
+
+            const toast = new bootstrap.Toast(toastElement[0]);
+            toast.show();
+        }
 
         // Update cart count in navbar - FIXED VERSION
         function updateCartCount(count) {
