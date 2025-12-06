@@ -36,4 +36,18 @@ public class CheckoutController : Controller
 
         return View(model);
     }
+
+    public IActionResult OrderHistory()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var orders = _context.Orders
+            .Where(o => o.UserId == userId)
+            .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+            .OrderByDescending(o => o.OrderDate)
+            .ToList();
+
+        return View(orders);
+    }
 }

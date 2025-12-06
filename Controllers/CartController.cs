@@ -1,10 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Ecomm.Data;
 using Ecomm.Models;
-using Ecomm.Data;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Ecomm.Controllers
 {
@@ -12,6 +17,7 @@ namespace Ecomm.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private const decimal UGX_RATE = 3800m; // example conversion rate
 
         public CartController(
             ApplicationDbContext context,
@@ -23,14 +29,12 @@ namespace Ecomm.Controllers
 
         private string GetUserId()
         {
-            // For authenticated users, use their UserId
-            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var authenticatedUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!string.IsNullOrEmpty(authenticatedUserId))
             {
                 return authenticatedUserId;
             }
 
-            // For guest users, use session ID
             var guestSessionId = HttpContext.Session.GetString("GuestSessionId");
             if (string.IsNullOrEmpty(guestSessionId))
             {
@@ -43,7 +47,7 @@ namespace Ecomm.Controllers
 
         private bool IsGuestUser(string userId)
         {
-            return userId.StartsWith("guest_");
+            return userId?.StartsWith("guest_") == true;
         }
 
         // GET: Cart
@@ -51,18 +55,17 @@ namespace Ecomm.Controllers
         {
             var userId = GetUserId();
 
-            // Get cart items with products
             var cartItems = await _context.CartItems
                 .Where(c => c.UserId == userId)
                 .Include(c => c.Product)
-                .ThenInclude(p => p != null ? p.Category : null)
-                .Where(ci => ci.Product != null) // Filter out deleted products
+                .ThenInclude(p => p.Category)
+                .Where(ci => ci.Product != null)
                 .ToListAsync();
 
             var viewModel = new CartViewModel
             {
                 CartItems = cartItems,
-                TotalAmount = cartItems.Sum(item => item.Product!.Price * item.Quantity),
+                TotalAmount = cartItems.Sum(item => (item.Product?.Price ?? 0m) * item.Quantity),
                 IsGuestUser = IsGuestUser(userId)
             };
 
@@ -80,7 +83,6 @@ namespace Ecomm.Controllers
                 var count = await _context.CartItems
                     .Where(c => c.UserId == userId)
                     .SumAsync(c => (int?)c.Quantity) ?? 0;
-
                 return Json(new { count = count });
             }
             catch
@@ -96,64 +98,35 @@ namespace Ecomm.Controllers
         {
             try
             {
-                // Validate request
-                if (request.Quantity <= 0)
+                if (request == null || request.Quantity <= 0)
                 {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Quantity must be greater than 0"
-                    });
+                    return Json(new { success = false, message = "Invalid request" });
                 }
 
-                // Get or create user ID
                 var userId = GetUserId();
-                var isGuestUser = IsGuestUser(userId);
-
-                // Get product
-                var product = await _context.Products
-                    .FirstOrDefaultAsync(p => p.Id == request.ProductId);
-
+                var product = await _context.Products.FindAsync(request.ProductId);
                 if (product == null)
                 {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Product not found"
-                    });
+                    return Json(new { success = false, message = "Product not found" });
                 }
 
-                // Check stock availability
                 if (product.StockCount < request.Quantity)
                 {
-                    return Json(new
-                    {
-                        success = false,
-                        message = $"Only {product.StockCount} items available in stock."
-                    });
+                    return Json(new { success = false, message = $"Only {product.StockCount} items available in stock." });
                 }
 
-                // Find existing cart item
-                var existingCartItem = await _context.CartItems
-                    .FirstOrDefaultAsync(c =>
-                        c.UserId == userId &&
-                        c.ProductId == request.ProductId);
+                var existing = await _context.CartItems
+                    .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == request.ProductId);
 
-                if (existingCartItem != null)
+                if (existing != null)
                 {
-                    // Check if total quantity exceeds stock
-                    var newTotalQuantity = existingCartItem.Quantity + request.Quantity;
-                    if (newTotalQuantity > product.StockCount)
+                    var newQty = existing.Quantity + request.Quantity;
+                    if (newQty > product.StockCount)
                     {
-                        return Json(new
-                        {
-                            success = false,
-                            message = $"Cannot add more items. Only {product.StockCount} available in stock."
-                        });
+                        return Json(new { success = false, message = $"Cannot add more items. Only {product.StockCount} available in stock." });
                     }
-
-                    existingCartItem.Quantity = newTotalQuantity;
-                    _context.CartItems.Update(existingCartItem);
+                    existing.Quantity = newQty;
+                    _context.CartItems.Update(existing);
                 }
                 else
                 {
@@ -161,36 +134,28 @@ namespace Ecomm.Controllers
                     {
                         UserId = userId,
                         ProductId = request.ProductId,
-                        Quantity = request.Quantity
+                        Quantity = request.Quantity,
+                        IsGuestCart = IsGuestUser(userId)
                     };
                     _context.CartItems.Add(cartItem);
                 }
 
                 await _context.SaveChangesAsync();
 
-                // Get updated cart count
-                var cartCount = await _context.CartItems
-                    .Where(c => c.UserId == userId)
-                    .SumAsync(c => (int?)c.Quantity) ?? 0;
+                var cartCount = await _context.CartItems.Where(c => c.UserId == userId).SumAsync(c => (int?)c.Quantity) ?? 0;
 
                 return Json(new
                 {
                     success = true,
-                    message = $"{product.Name} added to cart successfully!",
+                    message = "Added to cart successfully",
                     cartCount = cartCount,
-                    isGuestUser = isGuestUser,
                     productName = product.Name
                 });
             }
             catch (Exception ex)
             {
-                // Log the exception (use proper logging in production)
                 Console.WriteLine($"Error adding to cart: {ex.Message}");
-                return Json(new
-                {
-                    success = false,
-                    message = "An error occurred while adding to cart. Please try again."
-                });
+                return Json(new { success = false, message = "An error occurred while adding to cart." });
             }
         }
 
@@ -199,39 +164,49 @@ namespace Ecomm.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateQuantity([FromBody] UpdateQuantityRequest request)
         {
-            var userId = GetUserId();
-            var cartItem = await _context.CartItems
-                .Include(ci => ci.Product)
-                .FirstOrDefaultAsync(ci => ci.Id == request.CartItemId && ci.UserId == userId);
-
-            if (cartItem == null || cartItem.Product == null)
+            try
             {
-                return Json(new { success = false, message = "Item not found" });
+                var userId = GetUserId();
+                var cartItem = await _context.CartItems
+                    .Include(ci => ci.Product)
+                    .FirstOrDefaultAsync(ci => ci.Id == request.CartItemId && ci.UserId == userId);
+
+                if (cartItem == null || cartItem.Product == null)
+                {
+                    return Json(new { success = false, message = "Item not found" });
+                }
+
+                // Ensure requested quantity respects stock limits
+                if (request.Quantity < 1) request.Quantity = 1;
+                if (request.Quantity > cartItem.Product.StockCount) request.Quantity = cartItem.Product.StockCount;
+
+                cartItem.Quantity = request.Quantity;
+                await _context.SaveChangesAsync();
+
+                // calculate totals in UGX (server-side)
+                var itemTotalUGX = cartItem.Quantity * (cartItem.Product.Price * UGX_RATE);
+
+                var cartItems = await _context.CartItems
+                    .Include(ci => ci.Product)
+                    .Where(ci => ci.UserId == userId && ci.Product != null)
+                    .ToListAsync();
+
+                var totalUGX = cartItems.Sum(ci => ci.Quantity * (ci.Product!.Price * UGX_RATE));
+                var cartCount = cartItems.Sum(ci => ci.Quantity);
+
+                return Json(new
+                {
+                    success = true,
+                    itemTotal = $"Ushs {itemTotalUGX:N0}",
+                    totalAmount = $"Ushs {totalUGX:N0}",
+                    cartCount = cartCount
+                });
             }
-
-            cartItem.Quantity = request.Quantity;
-            await _context.SaveChangesAsync();
-
-            const decimal RATE = 3800;
-
-            // Calculate totals in UGX
-            var itemTotalUGX = cartItem.Quantity * (cartItem.Product.Price * RATE);
-
-            var cartItems = await _context.CartItems
-                .Include(ci => ci.Product)
-                .Where(ci => ci.UserId == userId)
-                .ToListAsync();
-
-            var totalUGX = cartItems.Sum(ci => ci.Quantity * (cartItem.Product.Price * RATE));
-            var cartCount = cartItems.Sum(ci => ci.Quantity);
-
-            return Json(new
+            catch (Exception ex)
             {
-                success = true,
-                itemTotal = $"Ushs {itemTotalUGX:N0}",
-                totalAmount = $"Ushs {totalUGX:N0}",
-                cartCount = cartCount
-            });
+                Console.WriteLine($"Error updating quantity: {ex.Message}");
+                return Json(new { success = false, message = "Error updating quantity" });
+            }
         }
 
         // POST: Cart/RemoveItem
@@ -243,48 +218,38 @@ namespace Ecomm.Controllers
             {
                 var userId = GetUserId();
                 var cartItem = await _context.CartItems
-                    .FirstOrDefaultAsync(ci =>
-                        ci.Id == request.CartItemId &&
-                        ci.UserId == userId);
+                    .Include(ci => ci.Product)
+                    .FirstOrDefaultAsync(ci => ci.Id == request.CartItemId && ci.UserId == userId);
 
                 if (cartItem == null)
                 {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Item not found in your cart"
-                    });
+                    return Json(new { success = false, message = "Item not found in your cart" });
                 }
 
                 _context.CartItems.Remove(cartItem);
                 await _context.SaveChangesAsync();
 
-                // Get updated cart data
                 var cartItems = await _context.CartItems
                     .Include(ci => ci.Product)
                     .Where(ci => ci.UserId == userId && ci.Product != null)
                     .ToListAsync();
 
                 var cartCount = cartItems.Sum(c => c.Quantity);
-                var totalAmount = cartItems.Sum(ci => ci.Product!.Price * ci.Quantity);
+                var totalUGX = cartItems.Sum(ci => ci.Quantity * (ci.Product!.Price * UGX_RATE));
 
                 return Json(new
                 {
                     success = true,
                     message = "Item removed from cart successfully!",
                     cartCount = cartCount,
-                    totalAmount = totalAmount.ToString("C2"),
+                    totalAmount = $"Ushs {totalUGX:N0}",
                     itemCount = cartItems.Count
                 });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error removing item: {ex.Message}");
-                return Json(new
-                {
-                    success = false,
-                    message = "Error removing item from cart"
-                });
+                return Json(new { success = false, message = "Error removing item from cart" });
             }
         }
 
@@ -296,21 +261,20 @@ namespace Ecomm.Controllers
             try
             {
                 var userId = GetUserId();
-                var cartItems = await _context.CartItems
-                    .Where(c => c.UserId == userId)
-                    .ToListAsync();
+                var cartItems = await _context.CartItems.Where(c => c.UserId == userId).ToListAsync();
 
                 if (cartItems.Any())
                 {
                     _context.CartItems.RemoveRange(cartItems);
                     await _context.SaveChangesAsync();
-                    TempData["Success"] = "Cart cleared successfully!";
                 }
 
+                TempData["Success"] = "Cart cleared successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error clearing cart: {ex.Message}");
                 TempData["Error"] = "Error clearing cart.";
                 return RedirectToAction(nameof(Index));
             }
@@ -318,6 +282,7 @@ namespace Ecomm.Controllers
 
         // POST: Cart/MergeGuestCart
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> MergeGuestCart()
         {
             try
@@ -331,27 +296,19 @@ namespace Ecomm.Controllers
                 var guestSessionId = HttpContext.Session.GetString("GuestSessionId");
                 if (!string.IsNullOrEmpty(guestSessionId))
                 {
-                    // Get guest cart items
                     var guestCartItems = await _context.CartItems
                         .Where(c => c.UserId == guestSessionId)
                         .ToListAsync();
 
                     foreach (var guestItem in guestCartItems)
                     {
-                        // Check if user already has this product in cart
                         var existingItem = await _context.CartItems
-                            .FirstOrDefaultAsync(c =>
-                                c.UserId == authenticatedUserId &&
-                                c.ProductId == guestItem.ProductId);
+                            .FirstOrDefaultAsync(c => c.UserId == authenticatedUserId && c.ProductId == guestItem.ProductId);
 
                         if (existingItem != null)
                         {
-                            // Merge quantities (check stock limits)
-                            var product = await _context.Products
-                                .FindAsync(guestItem.ProductId);
-
-                            if (product != null &&
-                                existingItem.Quantity + guestItem.Quantity <= product.StockCount)
+                            var product = await _context.Products.FindAsync(guestItem.ProductId);
+                            if (product != null && existingItem.Quantity + guestItem.Quantity <= product.StockCount)
                             {
                                 existingItem.Quantity += guestItem.Quantity;
                             }
@@ -360,20 +317,17 @@ namespace Ecomm.Controllers
                         }
                         else
                         {
-                            // Transfer to authenticated user
                             guestItem.UserId = authenticatedUserId;
                         }
                     }
 
                     await _context.SaveChangesAsync();
-
-                    // Clear guest session
                     HttpContext.Session.Remove("GuestSessionId");
                 }
 
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex) // This is the line with the warning
+            catch (Exception ex)
             {
                 Console.WriteLine($"Error merging cart: {ex.Message}");
                 return RedirectToAction(nameof(Index));
@@ -419,17 +373,19 @@ namespace Ecomm.Controllers
                     {
                         UserId = userId,
                         ProductId = productId,
-                        Quantity = quantity
+                        Quantity = quantity,
+                        IsGuestCart = IsGuestUser(userId)
                     };
                     _context.CartItems.Add(cartItem);
                 }
 
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Product added to cart successfully!";
-                return RedirectToAction("Index", "Products");
+                TempData["Success"] = "Product added to cart.";
+                return RedirectToAction("Details", "Products", new { id = productId });
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error adding to cart (redirect): {ex.Message}");
                 TempData["Error"] = "Error adding product to cart.";
                 return RedirectToAction("Index", "Products");
             }

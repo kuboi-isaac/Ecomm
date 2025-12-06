@@ -29,7 +29,7 @@ namespace Ecomm.Models
         public int CategoryId { get; set; }
 
         // Nullable because a product may not have a category loaded yet
-        public Category? Category { get; set; }
+        public Category Category { get; set; } = null!;
 
         public bool IsOnSale { get; set; } = false;
     }

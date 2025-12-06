@@ -4,418 +4,354 @@
 }
 
 <style>
-    /* Modern Breadcrumb */
-    .modern-breadcrumb {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 150%);
-        border-radius: 5px;
-        padding: 1rem 1rem;
+    /* WRAPPER */
+    .amazon-container {
+        max-width: 1300px;
+        margin: auto;
+        padding: 2rem 1rem;
+        font-family: Arial, sans-serif;
+    }
+
+    /* BREADCRUMB */
+    .amazon-breadcrumb nav {
+        font-size: 0.9rem;
+        color: #555;
         margin-bottom: 1rem;
-        margin-top: 1rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        height: 50px;
     }
 
-    .breadcrumb {
-        margin: 0;
-        background: transparent;
-    }
-
-    .breadcrumb-item a {
-        color: rgba(255, 255, 255, 0.9);
+    .amazon-breadcrumb a {
+        color: #007185;
         text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
     }
 
-        .breadcrumb-item a:hover {
-            color: white;
-            transform: translateY(-1px);
-        }
-
-    .breadcrumb-item.active {
-        color: white;
-        font-weight: 600;
+    .amazon-breadcrumb .active {
+        color: #111;
     }
 
-    .breadcrumb-item + .breadcrumb-item::before {
-        color: rgba(255, 255, 255, 0.7);
-        content: "›";
+    /* GRID (Amazon layout: Image / Info / Buybox) */
+    .amazon-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 2fr 1.2fr;
+        gap: 2rem;
     }
 
-    /* Product Card Styles */
-    .product-image-card {
-        border: none;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-
-        .product-image-card:hover {
-            transform: translateY(-5px);
-        }
-
-    .product-image {
+    /* IMAGE */
+    .amazon-main-img {
         width: 100%;
-        height: 500px;
-        object-fit: contain;
-        transition: transform 0.3s ease;
-    }
-
-    .product-details-card {
-        border: none;
-        border-radius: 5px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    }
-
-    .product-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0.1rem;
-    }
-
-    .category-badge {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 25px;
-        font-size: 0.6rem;
-        font-weight: 500;
-        margin-bottom: 0.1rem;
-    }
-
-    .price-section {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        padding: 0.5rem;
-        border-radius: 5px;
-        color: white;
-        margin: 1rem 0;
-        margin-bottom: 0.8rem;
-    }
-
-    .price-main {
-        font-size: 1.5rem;
-        font-weight: 500;
-        margin: 0;
-        padding: 0.5rem;
-    }
-
-    .sale-badge {
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        padding: 0.5rem;
-        border-radius: 15px;
-        font-weight: 600;
-    }
-
-    .stock-badge {
-        padding: 0.5rem;
-        border-radius: 25px;
-        font-weight: 600;
-        font-size: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .stock-in {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-    }
-
-    .stock-low {
-        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-        color: white;
-    }
-
-    .stock-out {
-        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-        color: white;
-    }
-
-    .description-section {
-        background: white;
-        padding: 0.5rem;
-        border-radius: 15px;
-        border-left: 5px solid #667eea;
-        box-shadow: 10px 15px 10px rgba(0, 0, 0, 0.08);
-    }
-
-    /* Quantity Input */
-    .quantity-control {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 0.8rem;
-        /* border-radius: 10px; */
-        color: white;
-        border-radius: 5px;
-    }
-
-    .quantity-input {
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 5px;
-        color: white;
-        font-weight: 700;
-        text-align: center;
-    }
-
-        .quantity-input:focus {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: none;
-            color: white;
-        }
-
-        .quantity-input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-    /* Add to Cart Button */
-    .add-to-cart-btn {
-        background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
-        border-radius: 5px;
-        padding: 0.4rem;
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: white;
-        transition: all 0.3s ease;
-        box-shadow: 0 5px 15px rgba(0, 176, 155, 0.4);
-    }
-
-        .add-to-cart-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 176, 155, 0.6);
-            background: linear-gradient(135deg, #009c84 100%, #85b836 100%);
-            color: white;
-        }
-
-        .add-to-cart-btn:disabled {
-            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
-            transform: none;
-            box-shadow: none;
-        }
-
-    /* Admin Actions */
-    .admin-actions {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        border-radius: 12px;
+        background: #f5f5f5;
         padding: 1rem;
-        border-radius: 15px;
-        margin-top: 1rem;
     }
 
-    .admin-btn {
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 5px;
-        padding: 0.75rem 1rem;
+    /* INFO MIDDLE SECTION */
+    .amazon-title {
+        font-size: 1.9rem;
         font-weight: 600;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
+        color: #111;
     }
 
-    .admin-btn-edit {
-        background: rgba(52, 152, 219, 0.2);
-        color: #3498db;
+    .amazon-category {
+        margin-bottom: 1rem;
+        color: #555;
     }
 
-        .admin-btn-edit:hover {
-            background: #3498db;
-            color: white;
-            transform: translateY(-2px);
+        .amazon-category a {
+            color: #007185;
         }
 
-    .admin-btn-delete {
-        background: rgba(231, 76, 60, 0.2);
-        color: #e74c3c;
+    /* PRICE */
+    .amazon-price-box {
+        font-size: 1.7rem;
+        margin: 1rem 0;
     }
 
-        .admin-btn-delete:hover {
-            background: #e74c3c;
-            color: white;
-            transform: translateY(-2px);
+    .amazon-price {
+        color: #4861ee;
+        font-weight: 700;
+    }
+
+    .amazon-sale-tag {
+        margin-left: 1rem;
+        padding: 0.3rem .8rem;
+        background: #4861ee;
+        font-size: 0.9rem;
+        border-radius: 4px;
+    }
+
+    /* STOCK */
+    .in-stock {
+        color: #4861ee;
+        font-weight: 700;
+    }
+
+    .low-stock {
+        color: #B12704;
+        margin-left: .5rem;
+    }
+
+    .out-stock {
+        color: #B12704;
+        font-weight: 700;
+    }
+
+    /* DESCRIPTION */
+    .amazon-section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: .6rem;
+    }
+
+    .amazon-description {
+        color: #333;
+        line-height: 1.6;
+    }
+
+    /* QUANTITY + ADD TO CART */
+    .amazon-quantity-box {
+        margin-top: 1.5rem;
+    }
+
+    .amazon-qty-input {
+        width: 50px;
+        padding: 5px;
+        margin-left: .5rem;
+        border: 1px solid #bbb;
+        border-radius: 3px;
+    }
+
+    /* BUTTONS */
+    .amazon-btn-yellow {
+        background: #4861ee;
+        border: 1px solid #4861ee;
+        padding: .7rem 1rem;
+        border-radius: 50px;
+        font-weight: bold;
+        cursor: pointer;
+        color: white;
+        font-size: 12px;
+    }
+
+        .amazon-btn-yellow:hover {
+            background: #4861ee;
         }
 
-    /* Toast Improvements */
-    .toast {
-        border-radius: 10px;
-        border: none;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    .amazon-btn-orange {
+        background: #4861ee;
+        border: 1px solid #4861ee;
+        padding: .7rem 1rem;
+        border-radius: 50px;
+        font-weight: bold;
+        color: #fff;
     }
 
-    /* Responsive Design */
+        .amazon-btn-orange:hover {
+            background: #4861ee;
+        }
+
+    .amazon-btn-disabled {
+        background: #ddd;
+        border-radius: 50px;
+        padding: 1rem;
+        font-size: 1.2rem;
+    }
+
+    /* BUYBOX RIGHT */
+    .amazon-buybox {
+        border: 1px solid #ddd;
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: #fafafa;
+    }
+
+    .buybox-price {
+        color: #B12704;
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    /* SECURE */
+    .secure-transaction {
+        color: #007185;
+        font-size: .9rem;
+    }
+
+    /* ADMIN */
+    .amazon-admin-box h6 {
+        font-weight: bold;
+        margin-bottom: .6rem;
+    }
+
+    .amazon-admin-btn {
+        display: inline-block;
+        padding: .5rem 1rem;
+        border-radius: 6px;
+        color: #fff;
+        margin-right: .5rem;
+        text-decoration: none;
+    }
+
+        .amazon-admin-btn.edit {
+            background: #007185;
+        }
+
+        .amazon-admin-btn.delete {
+            background: #B12704;
+        }
+
+    /* RESPONSIVE */
+    @@media (max-width: 992px) {
+        .amazon-grid
+
+    {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    }
+
     @@media (max-width: 768px) {
-        .product-title {
-            font-size: 2rem;
-        }
+        .amazon-grid
 
-        .price-main {
-            font-size: 2rem;
-        }
+    {
+        grid-template-columns: 1fr;
+    }
 
-        .modern-breadcrumb {
-            padding: 0.75rem 1rem;
-        }
+    .amazon-buybox {
+        max-width: 350px;
+        margin: auto;
+    }
 
-        .product-image {
-            height: 300px;
-        }
     }
 </style>
 
-<div class="container">
-    <!-- Modern Breadcrumb -->
-    <div class="modern-breadcrumb">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb ">
-                <li class="breadcrumb-item">
-                    <a href="@Url.Action("Index", "Home")">
-                        <i class="fas fa-home me-2"></i>Home
-                    </a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="@Url.Action("Index", "Products")">
-                        <i class="fas fa-shopping-bag me-2"></i>Products
-                    </a>
-                </li>
-                <li class="breadcrumb-item active">
-                    <i class="fas fa-chevron-right me-2"></i>@Model.Name
-                </li>
-            </ol>
+<div class="amazon-container">
+
+    <!-- AMAZON-STYLE BREADCRUMB -->
+    <div class="amazon-breadcrumb">
+        <nav>
+            <a href="@Url.Action("Index", "Home")">Home</a>
+            <span>›</span>
+            <a href="@Url.Action("Index", "Products")">Products</a>
+            <span>›</span>
+            <span class="active">@Model.Name</span>
         </nav>
     </div>
 
-    <div class="row g-4">
-        <!-- Product Image -->
-        <div class="col-lg-6">
-            <div class="product-image-card">
-                @{
-                    var imageUrl = !string.IsNullOrEmpty(Model.ImageUrl) ? Model.ImageUrl : $"https://picsum.photos/600/500?random={Model.Id}";
-                }
-                <img src="@imageUrl" class="product-image" alt="@Model.Name"
-                     onerror="this.src='https://via.placeholder.com/600x500/667eea/ffffff?text=No+Image+Available'">
+    <div class="row align-items-start g-4">
+
+        <!-- LEFT: PRODUCT IMAGE -->
+        <div class="col-lg-6 col-md-6 col-12">
+            <div class="product-image-wrapper">
+            @{
+                var imageUrl = !string.IsNullOrEmpty(Model.ImageUrl)
+                ? Model.ImageUrl
+                : $"https://picsum.photos/600/500?random={Model.Id}";
+            }
+
+                <img src="@imageUrl"
+                 class="amazon-main-img"
+                 alt="@Model.Name"
+                 onerror="this.src='https://via.placeholder.com/600x500/667eea/ffffff?text=No+Image+Available'">
             </div>
         </div>
 
-        <!-- Product Details -->
-        <div class="col-lg-6">
-            <div class="product-details-card p-4">
-                <!-- Title and Category -->
-                <div class="d-flex justify-content-between align-items-lg-center mb-4">
-                    <h1 class="product-title">@Model.Name</h1>
-                    <span class="category-badge">
-                        <i class="fas fa-tag me-2"></i>@(Model.Category?.Name ?? "Uncategorized")
-                    </span>
-                </div>
+        <!-- RIGHT: PRODUCT DETAILS -->
+        <div class="col-lg-6 col-md-6 col-12">
+            <div class="product-image-wrapper">
+                <h1 class="amazon-title">@Model.Name</h1>
 
-                <!-- Price Section -->
-                <div class="price-section">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h2 class="price-main">@Model.Price.ToString("C2")</h2>
-                            @if (Model.IsOnSale)
-                            {
-                                <p class="mb-0 opacity-75">
-                                    <i class="fas fa-tag me-2"></i>Special Offer
-                                </p>
-                            }
-                        </div>
-                        @if (Model.IsOnSale)
-                        {
-                            <span class="sale-badge">
-                                <i class="fas fa-bolt me-2"></i>ON SALE
-                            </span>
-                        }
-                    </div>
-                </div>
+            <div class="amazon-category">
+                Category: <a>@(Model.Category?.Name ?? "Uncategorized")</a>
+            </div>
 
-                <!-- Stock Status -->
-                <div class="mb-4">
-                    @if (Model.StockCount > 0)
-                    {
-                        <span class="stock-badge stock-in">
-                            <i class="fas fa-check-circle me-2"></i>@Model.StockCount in stock
-                        </span>
-                        @if (Model.StockCount <= 10)
-                        {
-                            <span class="stock-badge stock-low ms-2">
-                                <i class="fas fa-exclamation-triangle me-2"></i>Low Stock
-                            </span>
-                        }
-                    }
-                    else
-                    {
-                        <span class="stock-badge stock-out">
-                            <i class="fas fa-times-circle me-2"></i>Out of Stock
-                        </span>
-                    }
-                </div>
+            <hr />
 
-                <!-- Description -->
-                <div class="description-section mb-4">
-                    <h5 class="mb-3">
-                        <i class="fas fa-align-left me-2 text-primary"></i>Description
-                    </h5>
-                    <p class="text-muted mb-0 lead">@Model.Description</p>
-                </div>
+            <!-- PRICE -->
+            <div class="amazon-price-box">
+                <span class="amazon-price">@Model.Price.ToString("C2")</span>
 
-                <!-- Add to Cart Form -->
+                @if (Model.IsOnSale)
+                {
+                    <span class="amazon-sale-tag">On Sale</span>
+                }
+            </div>
+
+            <!-- STOCK -->
+            <div class="amazon-stock">
                 @if (Model.StockCount > 0)
                 {
-                    <div class="quantity-control">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" id="productId" value="@Model.Id">
+                    <span class="in-stock">In Stock</span>
 
-                        <div class="row g-3 align-items-center">
-                            <div class="col-md-4">
-                                <label for="quantity" class="form-label h5 mb-3">
-                                    <i class="fas fa-sort-numeric-up me-2"></i>Quantity:
-                                </label>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="number" class="form-control quantity-input w-50" id="quantity"
-                                       value="1" min="1" max="@Model.StockCount">
-                            </div>
-                            <div class="col-md-4">
-                                <button type="button" class="btn add-to-cart-btn w-100" id="addToCartBtn">
-                                    <i class="fas fa-shopping-cart me-4"></i>Add to Cart
-                                    <span class="spinner-border spinner-border-sm ms-2 d-none" id="addToCartSpinner"></span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    @if (Model.StockCount <= 10)
+                    {
+                        <span class="low-stock">Only @Model.StockCount left!</span>
+                    }
                 }
                 else
                 {
-                    <button class="btn btn-secondary btn-lg w-100 py-3" disabled>
-                        <i class="fas fa-times-circle me-2"></i>Currently Unavailable
-                    </button>
-                }
-
-                <!-- Admin Actions -->
-                @if (User.IsInRole("Admin"))
-                {
-                    <div class="admin-actions">
-                        <h6 class="text-white mb-3">
-                            <i class="fas fa-cog me-2"></i>Admin Actions
-                        </h6>
-                        <div class="btn-group w-100">
-                            <a href="@Url.Action("Edit", "Products", new { id = Model.Id })"
-                               class="btn admin-btn admin-btn-edit me-2">
-                                <i class="fas fa-edit me-2"></i>Edit Product
-                            </a>
-                            <a href="@Url.Action("Delete", "Products", new { id = Model.Id })"
-                               class="btn admin-btn admin-btn-delete">
-                                <i class="fas fa-trash me-2"></i>Delete
-                            </a>
-                        </div>
-                    </div>
+                    <span class="out-stock">Out of Stock</span>
                 }
             </div>
+
+            <hr />
+
+            <!-- DESCRIPTION -->
+            <h4 class="amazon-section-title">About this item</h4>
+            <p class="amazon-description">
+                @Model.Description
+            </p>
+
+            <hr />
+
+            <!-- QUANTITY + ADD TO CART -->
+            @if (Model.StockCount > 0)
+            {
+                <div class="amazon-quantity-box">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="productId" value="@Model.Id">
+
+                    <label>Quantity:</label>
+                    <input type="number"
+                           id="quantity"
+                           class="amazon-qty-input"
+                           value="1"
+                           min="1"
+                           max="@Model.StockCount" />
+
+                    <button id="addToCartBtn"
+                            type="button"
+                            class="amazon-btn-yellow">
+                        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                        <span class="spinner-border spinner-border-sm d-none" id="addToCartSpinner"></span>
+                    </button>
+                </div>
+            }
+            else
+            {
+                <button class="amazon-btn-disabled w-100">
+                    <i class="fas fa-times-circle me-2"></i>Currently Unavailable
+                </button>
+            }
+
+            <!-- ADMIN ACTIONS -->
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="amazon-admin-box mt-4">
+                    <h6>Admin Actions</h6>
+                    <a class="amazon-admin-btn edit" href="@Url.Action("Edit", "Products", new { id = Model.Id })">
+                        <i class="fas fa-edit me-2"></i>Edit
+                    </a>
+                    <a class="amazon-admin-btn delete" href="@Url.Action("Delete", "Products", new { id = Model.Id })">
+                        <i class="fas fa-trash me-2"></i>Delete
+                    </a>
+                </div>
+            }
+
         </div>
+        </div>
+
     </div>
 </div>
+
 
 <!-- Enhanced Toast Notification -->
 <div class="toast-container position-fixed top-0 end-0 p-3">

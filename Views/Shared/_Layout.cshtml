@@ -669,7 +669,7 @@
             animation: autoHide 5s ease-in forwards;
         }
 
-        @@keyframes autoHide {
+      @@keyframes autoHide { 
             0% {
                 opacity: 1;
             }
@@ -682,7 +682,7 @@
                 opacity: 0;
                 transform: translateY(-100%);
             }
-        }
+      }
 
         .navbar-toggler-icon {
             display: inline-block;
@@ -695,111 +695,165 @@
             background-size: 100%;
             background-color: dimgrey;
         }
+
+        /* Amazon Navbar */
+        .amazon-nav {
+            background-color: #ffffff;
+            padding: 10px 20px;
+            height: 60px;
+        }
+
+        .amazon-logo img {
+            height: 55px;
+        }
+
+        .amazon-nav-link {
+            color: darkblue !important;
+            font-size: 14px;
+            padding: 8px 12px;
+            text-decoration: underline;
+        }
+
+            .amazon-nav-link:hover {
+                color: cornflowerblue !important;
+            }
+
+        /* Search bar */
+        .amazon-search {
+            flex-grow: 1;
+            max-width: 600px;
+            margin: 0 20px;
+            border-style: unset;
+        }
+
+        .amazon-search-input {
+            border-radius: 4px 0 0 4px;
+            border: thin;
+            height: 40px;
+        }
+
+        .amazon-search-btn {
+            background: #ffffff;
+            border-radius: 0 4px 4px 0;
+            border: none;
+            height: 40px;
+        }
+
+            .amazon-search-btn:hover {
+                background: #6366f1;
+            }
+
+        /* Cart */
+        .amazon-cart-count {
+            background: #f99999;
+            color: #000;
+            font-weight: bold;
+            padding: 2px 6px;
+            font-size: 12px;
+            border-radius: 50%;
+            position: absolute;
+            top: -3px;
+            right: -12px;
+        }
+
+        .amazon-right-nav .amazon-nav-link {
+            margin-left: 15px;
+        }
+
+        /* Mobile Toggle Style */
+        .amazon-toggle .navbar-toggler-icon {
+            filter: invert(1);
+        }
+
+        /* Dropdown */
+        .dropdown-menu {
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <nav class="navbar navbar-expand-lg amazon-nav">
             <div class="container-fluid">
-                <!-- Mobile Toggle -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11z" />
-                    </svg>
-                </button>
 
-
-                <!-- Brand/Logo -->
-                <a class="navbar-brand d-none d-lg-block me-4 fw-bold" asp-area="" asp-controller="Home" asp-action="Index" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
-                    <img src="https://img1.wsimg.com/isteam/ip/48686206-1376-4d8b-bb8b-665ec1c50e07/blob-1afa769.png/:/rs=w:195,h:162,cg:true,m/cr=w:195,h:162/qt=q:95" alt="Company Logo" style="height: 60px; width: auto;">
+                <!-- Logo -->
+                <a class="navbar-brand amazon-logo d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <img src="https://img1.wsimg.com/isteam/ip/48686206-1376-4d8b-bb8b-665ec1c50e07/blob-1afa769.png/:/rs=w:195,h:162,cg=true,m/cr=w:195,h:162/qt=q:95" />
                 </a>
 
-                <!-- Main Navbar Content -->
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler amazon-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Nav Content -->
                 <div class="collapse navbar-collapse" id="navbarMain">
-                    <!-- Left Navigation - Main Menu -->
-                    <ul class="navbar-nav me-auto align-content-between">
-                        <li class="nav-item me-4">
-                            <a class="nav-link d-flex flex-column align-items-center" asp-area="" asp-controller="Home" asp-action="Index" title="Home">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi fas fa-house mb-1" viewBox="0 0 16 16">
-                                    <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z" />
-                                </svg>
-                                <small class="nav-text">Home</small>
-                            </a>
+
+                    <!-- LEFT: Menu -->
+                    <ul class="navbar-nav me-auto align-items-center amazon-left-nav">
+
+                        <li class="nav-item">
+                            <a class="amazon-nav-link" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
-                        <!-- Products Dropdown -->
-                        <li class="nav-item dropdown me-3">
-                            <a class="nav-link d-flex flex-column align-items-center" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" title="Products">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="fas fa-box-open mb-1" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0" />
-                                    <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z" />
-                                </svg>
-                                <small class="nav-text">Products</small>
+                        <li class="nav-item dropdown">
+                            <a class="amazon-nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                Products
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+
+                            <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">All Products</a></li>
+
                                 @if (User.IsInRole("Admin"))
-                               {
-                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Create">Add New Product</a></li>
-                                <li><a class="dropdown-item" asp-controller="Products" asp-action="LowStock">Low Stock Alerts</a></li>
-                               }
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Products" asp-action="Create">Add Product</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Products" asp-action="LowStock">Low Stock</a></li>
+                                }
                             </ul>
                         </li>
 
-                        <li class="nav-item md-2">
-                            <a class="nav-link d-flex flex-column align-items-center" asp-controller="Checkout" asp-action="OrderHistory" title="Order History">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="24" fill="currentColor" class="bi bi-clock-history mb-1" viewBox="0 0 16 16">
-                                    <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022zm2.004.45a7 7 0 0 0-.985-.299l.219-.976q.576.129 1.126.342zm1.37.71a7 7 0 0 0-.439-.27l.493-.87a8 8 0 0 1 .979.654l-.615.789a7 7 0 0 0-.418-.302zm1.834 1.79a7 7 0 0 0-.653-.796l.724-.69q.406.429.747.91zm.744 1.352a7 7 0 0 0-.214-.468l.893-.45a8 8 0 0 1 .45 1.088l-.95.313a7 7 0 0 0-.179-.483m.53 2.507a7 7 0 0 0-.1-1.025l.985-.17q.1.58.116 1.17zm-.131 1.538q.05-.254.081-.51l.993.123a8 8 0 0 1-.23 1.155l-.964-.267q.069-.247.12-.501m-.952 2.379q.276-.436.486-.908l.914.405q-.24.54-.555 1.038zm-.964 1.205q.183-.183.35-.378l.758.653a8 8 0 0 1-.401.432z" />
-                                    <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0z" />
-                                    <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5" />
-                                </svg>
-                                <small class="nav-text">Orders</small>
-                            </a>
+                        <li class="nav-item">
+                            <a class="amazon-nav-link" asp-controller="Checkout" asp-action="OrderHistory">Orders</a>
                         </li>
                     </ul>
 
-                    <!-- Center - Search Bar -->
-                    <form class="d-flex navbar-search mx-2 mx-lg-4" method="get" action="@Url.Action("Index", "Products")">
-                        <div class="input-group w-100">
-                            <input class="form-control me-2" type="search" name="searchString" placeholder="Search" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Search</button>
+                    <!-- CENTER: Search -->
+                    <form class="amazon-search" method="get" action="@Url.Action("Index", "Products")">
+                        <div class="input-group">
+                            <input class="form-control amazon-search-input" type="search" name="searchString" placeholder="Search products">
+                            <button class="btn amazon-search-btn" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </div>
                     </form>
 
-                    <!-- Right Navigation - User Actions -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Cart -->
-                        <li class="nav-item me-4">
-                            <a class="nav-link d-flex flex-column align-items-center" asp-controller="Cart" asp-action="Index" title="Cart">
-                                <div class="position-relative">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-cart3 mb-1" viewBox="0 0 16 16">
-                                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
-                                    </svg>
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
-                                        0
-                                    </span>
-                                </div>
-                                <small class="nav-text">Cart</small>
-                            </a>
-                        </li>
+                    <!-- RIGHT: User & Cart -->
+                    <ul class="navbar-nav ms-auto align-items-center amazon-right-nav">
 
-                        <!-- User Menu -->
-                        <li class="nav-item dropdown me-4">
-                            <a class="nav-link d-flex flex-column align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" title="Account">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-fas fa-user-circle mb-1" viewBox="0 0 16 16">
-                                    <path d="M12.5 9a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7m.354 5.854 1.5-1.5a.5.5 0 0 0-.708-.708l-.646.647V10.5a.5.5 0 0 0-1 0v2.793l-.646-.647a.5.5 0 0 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                                    <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4" />
-                                </svg>
-                                <small class="nav-text">Account</small>
+                        <!-- Account -->
+                        <li class="nav-item dropdown">
+                            <a href="#" class="amazon-nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                Account
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 <partial name="_LoginPartial" />
                             </ul>
+                        </li>
+
+                        <!-- Cart -->
+                        <li class="nav-item">
+                            <a class="amazon-nav-link position-relative" asp-controller="Cart" asp-action="Index">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="amazon-cart-count" id="cartCount">0</span>
+                                Cart
+                            </a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
+
     </header>
 
 
