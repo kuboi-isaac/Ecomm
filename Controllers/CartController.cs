@@ -161,7 +161,8 @@ namespace Ecomm.Controllers
                     {
                         UserId = userId,
                         ProductId = request.ProductId,
-                        Quantity = request.Quantity
+                        Quantity = request.Quantity,
+                        IsGuestCart = IsGuestUser(userId)
                     };
                     _context.CartItems.Add(cartItem);
                 }
@@ -233,9 +234,18 @@ namespace Ecomm.Controllers
                 cartCount = cartCount
             });
         }
-
+                return Json(new { success = false, message = "Error updating quantity" });
         // POST: Cart/RemoveItem
         [AllowAnonymous]
+        }
+                return Json(new { success = false, message = "Error updating quantity" });
+        /// POST: Cart/RemoveFromCart
+        }
+                return Json(new { success = false, message = "Error updating quantity" });
+        /// POST: Cart/RemoveFromCart
+        }
+
+        /// POST: Cart/RemoveFromCart
         [HttpPost]
         public async Task<IActionResult> RemoveItem([FromBody] RemoveFromCartRequest request)
         {
@@ -259,15 +269,6 @@ namespace Ecomm.Controllers
                 _context.CartItems.Remove(cartItem);
                 await _context.SaveChangesAsync();
 
-                // Get updated cart data
-                var cartItems = await _context.CartItems
-                    .Include(ci => ci.Product)
-                    .Where(ci => ci.UserId == userId && ci.Product != null)
-                    .ToListAsync();
-
-                var cartCount = cartItems.Sum(c => c.Quantity);
-                var totalAmount = cartItems.Sum(ci => ci.Product!.Price * ci.Quantity);
-
                 return Json(new
                 {
                     success = true,
@@ -277,21 +278,30 @@ namespace Ecomm.Controllers
                     itemCount = cartItems.Count
                 });
             }
+
+                return Json(new { success = false, message = "Item not found in your cart" });
+            }
+
+                return Json(new { success = false, message = "Item not found in your cart" });
+            }
+
+                return Json(new { success = false, message = "Item not found in your cart" });
+            }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error removing item: {ex.Message}");
-                return Json(new
-                {
-                    success = false,
-                    message = "Error removing item from cart"
-                });
-            }
-        }
-
         // POST: Cart/Clear
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Clear()
+        // GET: Cart/GetCartCount
+        [HttpGet]
+        public async Task<JsonResult> GetCartCount()
+        // GET: Cart/GetCartCount
+        [HttpGet]
+        public async Task<JsonResult> GetCartCount()
+        // GET: Cart/GetCartCount
+        [HttpGet]
+        public async Task<JsonResult> GetCartCount()
         {
             try
             {
@@ -300,23 +310,23 @@ namespace Ecomm.Controllers
                     .Where(c => c.UserId == userId)
                     .ToListAsync();
 
-                if (cartItems.Any())
+            catch
                 {
                     _context.CartItems.RemoveRange(cartItems);
-                    await _context.SaveChangesAsync();
+            catch (UnauthorizedAccessException)
                     TempData["Success"] = "Cart cleared successfully!";
                 }
-
-                return RedirectToAction(nameof(Index));
+            catch (UnauthorizedAccessException)
+        // POST: Cart/MergeGuestCart
             }
-            catch
-            {
+            catch (UnauthorizedAccessException)
+        // POST: Cart/ClearCart
                 TempData["Error"] = "Error clearing cart.";
                 return RedirectToAction(nameof(Index));
-            }
+        // POST: Cart/ClearCart
         }
 
-        // POST: Cart/MergeGuestCart
+        // POST: Cart/ClearCart
         [HttpPost]
         public async Task<IActionResult> MergeGuestCart()
         {
@@ -419,19 +429,19 @@ namespace Ecomm.Controllers
                     {
                         UserId = userId,
                         ProductId = productId,
-                        Quantity = quantity
-                    };
-                    _context.CartItems.Add(cartItem);
-                }
-
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Product added to cart successfully!";
-                return RedirectToAction("Index", "Products");
-            }
             catch
-            {
+                    };
                 TempData["Error"] = "Error adding product to cart.";
                 return RedirectToAction("Index", "Products");
+            catch (UnauthorizedAccessException)
+
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            catch (UnauthorizedAccessException)
+                return RedirectToAction("Index", "Products");
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            catch (UnauthorizedAccessException)
+            {
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
             }
         }
     }

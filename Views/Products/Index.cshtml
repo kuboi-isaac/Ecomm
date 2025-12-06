@@ -428,14 +428,17 @@
                 console.log('Response result:', result);
 
                 if (result.success) {
-                    showToast(result.message || 'Product added to cart!');
-                    updateCartCount(result.cartCount || 0);
+                    // Show success message as toast notification
+                    showToast(result.message);
+
+                    // Update cart count in navbar
+                    updateCartCount(result.cartCount);
                 } else {
                     showToast(result.message || 'Error adding product to cart', 'error');
                 }
             } catch (error) {
-                console.error('Error details:', error);
-                showToast('Network error. Please try again.', 'error');
+                console.error('Error:', error);
+                showToast('Kindly login to Add to Cart', 'error');
             } finally {
                 // Restore button state
                 button.disabled = false;
@@ -474,54 +477,49 @@
         }
 
         // Show toast notification
+                // Enhanced toast notification with guest user messaging
         function showToast(message, type = 'success') {
-            const toastElement = document.getElementById('cartToast');
-            const toastMessage = document.getElementById('toastMessage');
+    const toastElement = $('#cartToast');
+    const toastMessage = $('#toastMessage');
 
-            if (!toastElement || !toastMessage) {
-                console.error('Toast elements not found');
-                return;
-            }
+    toastMessage.text(message);
 
-            toastMessage.textContent = message;
+    // Remove all type classes and add the current one
+    toastElement.removeClass('success error warning info');
+    
+    if (type === 'error') {
+        toastElement.addClass('error');
+        toastElement.find('.toast-header').html(`
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong class="me-auto">Attention Required</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        `);
+    } else if (type === 'warning') {
+        toastElement.addClass('warning');
+        toastElement.find('.toast-header').html(`
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong class="me-auto">Warning</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        `);
+    } else if (type === 'info') {
+        toastElement.addClass('info');
+        toastElement.find('.toast-header').html(`
+            <i class="fas fa-info-circle me-2"></i>
+            <strong class="me-auto">Information</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        `);
+    } else {
+        toastElement.addClass('success');
+        toastElement.find('.toast-header').html(`
+            <i class="fas fa-check-circle me-2"></i>
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        `);
+    }
 
-            // Remove all type classes
-            toastElement.classList.remove('success', 'error', 'warning', 'info');
-
-            // Add the current type class
-            toastElement.classList.add(type);
-
-            // Update header based on type
-            const toastHeader = toastElement.querySelector('.toast-header');
-            if (toastHeader) {
-                let iconClass = 'fas fa-shopping-cart text-primary me-2';
-                let title = 'Cart';
-
-                if (type === 'error') {
-                    iconClass = 'fas fa-exclamation-circle me-2';
-                    title = 'Error';
-                } else if (type === 'warning') {
-                    iconClass = 'fas fa-exclamation-triangle me-2';
-                    title = 'Warning';
-                } else if (type === 'info') {
-                    iconClass = 'fas fa-info-circle me-2';
-                    title = 'Information';
-                } else if (type === 'success') {
-                    iconClass = 'fas fa-check-circle me-2';
-                    title = 'Success';
-                }
-
-                toastHeader.innerHTML = `
-                    <i class="${iconClass}"></i>
-                    <strong class="me-auto">${title}</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                `;
-            }
-
-            // Show the toast
-            const toast = new bootstrap.Toast(toastElement);
-            toast.show();
-        }
+    const toast = new bootstrap.Toast(toastElement[0]);
+    toast.show();
+}
 
         // Update cart count in navbar
         function updateCartCount(count) {
