@@ -30,37 +30,13 @@ namespace Ecomm.Controllers
         private string GetUserId()
         {
             // For authenticated users, use their UserId
-<<<<<<<<< Temporary merge branch 1
-            // For guest users, use session ID
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                // Create or get guest session ID
-                userId = GetOrCreateGuestSessionId();
-            }
-
-            return userId;
-        }
-
-        private string GetOrCreateGuestSessionId()
-        {
-            var sessionId = HttpContext.Session.GetString("GuestSessionId");
-
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                sessionId = $"guest_{Guid.NewGuid()}";
-                HttpContext.Session.SetString("GuestSessionId", sessionId);
-            }
-
-            return sessionId;
-=========
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!string.IsNullOrEmpty(authenticatedUserId))
             {
                 return authenticatedUserId;
             }
 
+            // For guest users, use session ID
             var guestSessionId = HttpContext.Session.GetString("GuestSessionId");
             if (string.IsNullOrEmpty(guestSessionId))
             {
@@ -160,8 +136,7 @@ namespace Ecomm.Controllers
                     {
                         UserId = userId,
                         ProductId = request.ProductId,
-                        Quantity = request.Quantity,
-                        IsGuestCart = IsGuestUser(userId)
+                        Quantity = request.Quantity
                     };
                     _context.CartItems.Add(cartItem);
                 }
@@ -237,15 +212,6 @@ namespace Ecomm.Controllers
 
         // POST: Cart/RemoveItem
         [AllowAnonymous]
-        }
-                return Json(new { success = false, message = "Error updating quantity" });
-        /// POST: Cart/RemoveFromCart
-        }
-                return Json(new { success = false, message = "Error updating quantity" });
-        /// POST: Cart/RemoveFromCart
-        }
-
-        /// POST: Cart/RemoveFromCart
         [HttpPost]
         public async Task<IActionResult> RemoveItem([FromBody] RemoveFromCartRequest request)
         {
@@ -286,34 +252,19 @@ namespace Ecomm.Controllers
                 Console.WriteLine($"Error removing item: {ex.Message}");
                 return Json(new { success = false, message = "Error removing item from cart" });
             }
+        }
 
-                return Json(new { success = false, message = "Item not found in your cart" });
-            }
-
-                return Json(new { success = false, message = "Item not found in your cart" });
-            }
-            catch (Exception ex)
-            {
         // POST: Cart/Clear
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Clear()
-        // GET: Cart/GetCartCount
-        [HttpGet]
-        public async Task<JsonResult> GetCartCount()
-        // GET: Cart/GetCartCount
-        [HttpGet]
-        public async Task<JsonResult> GetCartCount()
-        // GET: Cart/GetCartCount
-        [HttpGet]
-        public async Task<JsonResult> GetCartCount()
         {
             try
             {
                 var userId = GetUserId();
                 var cartItems = await _context.CartItems.Where(c => c.UserId == userId).ToListAsync();
 
-            catch
+                if (cartItems.Any())
                 {
                     _context.CartItems.RemoveRange(cartItems);
                     await _context.SaveChangesAsync();
@@ -327,12 +278,12 @@ namespace Ecomm.Controllers
                 Console.WriteLine($"Error clearing cart: {ex.Message}");
                 TempData["Error"] = "Error clearing cart.";
                 return RedirectToAction(nameof(Index));
-        // POST: Cart/ClearCart
+            }
         }
 
-        // POST: Cart/ClearCart
-        [HttpPost]
+        // POST: Cart/MergeGuestCart
         [AllowAnonymous]
+        [HttpPost]
         public async Task<IActionResult> MergeGuestCart()
         {
             try
@@ -423,7 +374,7 @@ namespace Ecomm.Controllers
                     {
                         UserId = userId,
                         ProductId = productId,
-            catch
+                        Quantity = quantity
                     };
                     _context.CartItems.Add(cartItem);
                 }
