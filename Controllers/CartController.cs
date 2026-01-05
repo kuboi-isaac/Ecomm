@@ -1,15 +1,9 @@
 ﻿using Ecomm.Data;
 using Ecomm.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Ecomm.Controllers
 {
@@ -379,7 +373,7 @@ namespace Ecomm.Controllers
                     _context.CartItems.Add(cartItem);
                 }
 
-                await _context.SaveChangesAsync();
+                object value = await _context.SaveChangesAsync();
                 TempData["Success"] = "Product added to cart.";
                 return RedirectToAction("Details", "Products", new { id = productId });
             }

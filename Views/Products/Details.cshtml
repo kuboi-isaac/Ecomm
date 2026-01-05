@@ -324,12 +324,14 @@
                         <span class="spinner-border spinner-border-sm d-none" id="addToCartSpinner"></span>
                     </button>
                         @{
-                            string phone = "256700000000"; // Your WhatsApp contact
+                            string phone = string.IsNullOrEmpty(Model.WhatsAppPhone)
+                            ? "256700000000"   // fallback default
+                            : Model.WhatsAppPhone;
+
                             string message = $"Hello, I would like to inquire about {Model.Name}";
                             string encodedMessage = Uri.EscapeDataString(message);
                             string waLink = $"https://wa.me/{phone}?text={encodedMessage}";
                         }
-
                         <a href="@waLink" target="_blank" class="btn btn-success mt-3 w-100">
                             <i class="fab fa-whatsapp me-2"></i> Chat with Seller on WhatsApp
                         </a>

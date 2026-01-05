@@ -27,6 +27,8 @@ namespace Ecomm.Models
         public string ImageUrl { get; set; } = "/images/products/default.png";
 
         public int CategoryId { get; set; }
+        public string? WhatsAppPhone { get; set; }
+
 
         // Nullable because a product may not have a category loaded yet
         public Category Category { get; set; } = null!;

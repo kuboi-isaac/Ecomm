@@ -143,5 +143,10 @@ namespace Ecomm.Data
                 }
             );
         }
+
+        internal async Task<object> SaveChangesAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

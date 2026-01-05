@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Ecomm.Models;
 using Ecomm.Data;
 using System.Diagnostics;
