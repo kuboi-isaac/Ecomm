@@ -8,26 +8,32 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<!-- UI/CSS Packages -->
 		<PackageReference Include="bootstrap" Version="5.3.8" />
+		<PackageReference Include="Modernizr" Version="2.8.3" />
+
+		<!-- Identity Packages -->
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.19" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.19" />
 
-		<!-- EF Core Providers (all version 8.x) -->
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.19" />
-		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.3" />
-
-		<!-- EF Core Tools (must match EF Core major version) -->
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
+		<!-- Entity Framework Core Packages (ALL version 8.0.19) -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.19" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.19">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.19">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
-		<PackageReference Include="Modernizr" Version="2.8.3" />
+		<!-- PostgreSQL Provider (MUST match EF Core version 8.0.x) -->
+		<!-- Use 8.0.6 which is compatible with EF Core 8.0.19 -->
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.6" />
+		<PackageReference Include="Npgsql" Version="8.0.6" />
 
-		<!-- Npgsql ADO.NET driver (not EF, safe) -->
-		<PackageReference Include="Npgsql" Version="9.0.4" />
+		<!-- Code Generation -->
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
 	</ItemGroup>
 
 </Project>
